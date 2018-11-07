@@ -1,9 +1,3 @@
-# Copyright (c) 2015-present, Facebook, Inc.
-# All rights reserved.
-#
-# This source code is licensed under the BSD+Patents license found in the
-# LICENSE file in the root directory of this source tree.
-
 #! /usr/bin/env python3
 import numpy as np
 import time
@@ -12,6 +6,7 @@ import sys
 
 import imageio
 from skimage import transform
+from collections import Counter
 
 # Get command-line arguments
 # k = int(sys.argv[1])
@@ -23,7 +18,7 @@ from skimage import transform
 def load_image(img_path, resize=True):
     tmp_img = imageio.imread(img_path)
     if resize:
-        return transform.resize(image=tmp_img,output_shape=(400,400))
+        return transform.resize(image=tmp_img,output_shape=(200,200))
     return tmp_img
 
 # x = x.reshape(x.shape[0], -1).astype('float32')
@@ -54,13 +49,32 @@ def train_kmeans(x, k):
 
     return centroids.reshape(k, d)
 
-def run(image_path,clusters=10):
+def run(image_path,clusters=10,c_size=True):
     img_x = load_image(image_path)
     img_x = img_x.reshape((img_x.shape[0] * img_x.shape[1], 3)).astype('float32')
     centroids_ = train_kmeans(img_x, clusters)
-    return (255*centroids_).astype("uint8")
+    if c_size:
+        labels = compute_cluster_assignment(centroids_,img_x)
+        counts = Counter(labels)
+        centroids_ = (centroids_*255).astype("uint8")
+        sizes = list(zip([centroids_[k] for k in counts.keys()],counts.values()))
+        return centroids_, sizes
+    else:
+        return (centroids_*255).astype("uint8")
 
-# t0 = time.time()
-# t1 = time.time()
-#
-# print("k-Means runtime: %.3f s" % (t1 - t0))
+def compute_cluster_assignment(centroids, x):
+    assert centroids is not None, "should train before assigning"
+    d = centroids.shape[1]
+
+    res = faiss.StandardGpuResources()
+
+    cfg = faiss.GpuIndexFlatConfig()
+    cfg.useFloat16 = False
+    cfg.device = 0
+
+    index = faiss.GpuIndexFlatL2(res, d, cfg)
+    index.add(centroids)
+    distances, labels = index.search(x, 1)
+    return labels.ravel()
+
+run("data/images/golden1.jpg")

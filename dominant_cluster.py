@@ -6,7 +6,7 @@ import cv2
 def get_dom_colors(image_path,clusters=10,plot=False):
 	image = cv2.imread(image_path)
 	image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-	# flatten to 1d
+	# flatten from 3d to 2d 
 	image = image.reshape((image.shape[0] * image.shape[1], 3))
 	# cluster the pixel intensities
 	clt = KMeans(n_clusters = clusters)

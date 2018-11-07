@@ -24,7 +24,7 @@ Then we can perform a similarity search using these dominant colors to find simi
 
 We can cluster smaller images/features and use the faiss - GPU implementation instead of sklearn.
 
-**TODO**
+**TODO: ** test with sklearn and benchmark
 
 ### Using Wavelet image hash for similarity search:
 
