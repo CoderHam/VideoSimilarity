@@ -7,6 +7,7 @@ import sys
 import imageio
 from skimage import transform
 from collections import Counter
+import cv2
 
 # Get command-line arguments
 # k = int(sys.argv[1])
@@ -55,12 +56,27 @@ def run(image_path,clusters=10,c_size=True):
     centroids_ = train_kmeans(img_x, clusters)
     if c_size:
         labels = compute_cluster_assignment(centroids_,img_x)
-        counts = Counter(labels)
+        # hist = hist.astype("float")
+        # (hist, _) = np.histogram(labels, bins=clusters)
+        # hist /= hist.sum()
         centroids_ = (centroids_*255).astype("uint8")
-        sizes = list(zip([centroids_[k] for k in counts.keys()],counts.values()))
-        return centroids_, sizes
+        counts = Counter(labels).most_common()
+        total = sum(n for _, n in counts)
+        centroids_sizes = [(val/total, centroids_[k]) for k,val in counts]
+        bar_img = bar_colors(centroids_sizes)
+        return centroids_, bar_img
     else:
         return (centroids_*255).astype("uint8")
+
+def bar_colors(centroids_sizes):
+	bar = np.zeros((1, 100, 3), dtype = "uint8")
+	startX = 0
+	for (percent, color) in centroids_sizes:
+		endX = startX + (percent * 100)
+		cv2.rectangle(bar, (int(startX), 0), (int(endX), 50),
+			color.astype("uint8").tolist(), -1)
+		startX = endX
+	return bar
 
 def compute_cluster_assignment(centroids, x):
     assert centroids is not None, "should train before assigning"
@@ -76,5 +92,3 @@ def compute_cluster_assignment(centroids, x):
     index.add(centroids)
     distances, labels = index.search(x, 1)
     return labels.ravel()
-
-run("data/images/golden1.jpg")
