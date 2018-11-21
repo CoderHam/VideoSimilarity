@@ -28,7 +28,7 @@ def train_kmeans(x, k):
     "Runs kmeans on one or several GPUs"
     d = x.shape[1]
     clus = faiss.Clustering(d, k)
-    clus.verbose = True
+    clus.verbose = False
     clus.niter = 20
 
     clus.max_points_per_centroid = 10000000
