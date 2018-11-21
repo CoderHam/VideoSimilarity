@@ -39,10 +39,8 @@ We can cluster smaller images/features and use the faiss - GPU implementation in
 
 **TODO:** run KNN on image representations in [`data/vid2img`](https://github.com/CoderHam/VideoSimilarity/tree/master/data/vid2img)
 
-**TODO: ** test with sklearn and benchmark
+**TODO:** test with sklearn and benchmark
 
 ### Using Wavelet image hash for similarity search:
 
 https://fullstackml.com/wavelet-image-hash-in-python-3504fdd282b5 - Uses [imagehash](https://pypi.org/project/ImageHash/), a python library to compute 1 of 4 different hashes and use hashes for comparison
-
-**TODO**
