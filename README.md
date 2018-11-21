@@ -29,9 +29,15 @@ The next step is to concatenate these **100** pixel images for each frame (sampl
 
 This compressed image representation is thereafter used to find similar images using either the **MSE** or **SSIM** similarity metric or by using the **KNN** algorithm.
 
+PS: For the current experiments, **L** and **n** is variable but I have used a script to extract a fixed number of frames **(20)** for each video. Thus the new image representation is **20 x 100 x 3** [since there are 3 channels (RGB)].
+
+I have extracted this image representation for the videos in [`data/videos`](https://github.com/CoderHam/VideoSimilarity/tree/master/data/videos) and will now use KNN to return k-similar neighbors.
+
 ### KNN similarity search
 
 We can cluster smaller images/features and use the faiss - GPU implementation instead of sklearn.
+
+**TODO:** run KNN on image representations in [`data/vid2img`](https://github.com/CoderHam/VideoSimilarity/tree/master/data/vid2img)
 
 **TODO: ** test with sklearn and benchmark
 
