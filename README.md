@@ -39,4 +39,17 @@ We can cluster smaller images/features and use the faiss - GPU implementation in
 
 https://fullstackml.com/wavelet-image-hash-in-python-3504fdd282b5 - Uses [imagehash](https://pypi.org/project/ImageHash/), a python library to compute 1 of 4 different hashes and use hashes for comparison
 
-**TODO**
+## Image Feature Extraction using CNN
+
+Initial experiment results with Resent18:
+
+Number of Trials: 10
+Image 1 Feature Vector Genration Time: 0.013s
+Image 2 Feature Vector Genration Time: 0.013s
+
+Corpus Size=3000000, Frames per Video=100
+Corpus Processing Time: 1083.333 hrs, or 45.139 days
+
+Initial experiment results with Alexnet:
+
+N/A
