@@ -44,10 +44,13 @@ https://fullstackml.com/wavelet-image-hash-in-python-3504fdd282b5 - Uses [imageh
 Initial experiment results with Resent18:
 
 Number of Trials: 10
+
 Image 1 Feature Vector Genration Time: 0.013s
+
 Image 2 Feature Vector Genration Time: 0.013s
 
 Corpus Size=3000000, Frames per Video=100
+
 Corpus Processing Time: 1083.333 hrs, or 45.139 days
 
 Initial experiment results with Alexnet:
