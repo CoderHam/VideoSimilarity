@@ -33,7 +33,6 @@ def knn_ivf(vector_x, queries_x, d, k):
     gpu_index_ivf.add(vector_x)          # add vectors to the index
     print("Running with IVF index for",gpu_index_ivf.ntotal,"records of with dimensionality",d)
 
-    # we want to see 4 nearest neighbors
     D, I = gpu_index_ivf.search(queries_x, k)  # actual search
     return D, I
 
@@ -54,7 +53,6 @@ def run(k,flat=True):
     else:
         D, I = knn_ivf(vector_x, queries_x, d, k)
     # print(I[:5])                   # neighbors of the 5 first queries
-    # print(I[-5:])                  # neighbors of the 5 last queries
     # print(list(zip(D[:5],I[:5])))
 
 # run(10)
