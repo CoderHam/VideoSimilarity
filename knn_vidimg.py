@@ -14,7 +14,7 @@ import knn_gpu
 def load_image(img_path, resize=True):
     tmp_img = imageio.imread(img_path)
     if resize:
-        return transform.resize(image=tmp_img,output_shape=(200,200))
+        return transform.resize(image=tmp_img,output_shape=(200,200),anti_aliasing=True, mode='constant')
     return tmp_img
 
 def build_vector(vid2img_list):
@@ -37,8 +37,7 @@ def run_vid2img(vid2img_list,k,flat=True):
     else:
         D, I = knn_gpu.knn_ivf(img_vectors, img_vectors, d, k)
 
-    print(vid2img_list[0],":",[vid2img_list[i] for i in I[0]])
     return I
 
 # vid2img_list = sorted(glob.glob('data/vid2img/*.jpg'))
-# run_vid2img(vid2img_list,3)
+# run_vid2img(vid2img_list,5)

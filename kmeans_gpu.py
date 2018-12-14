@@ -19,7 +19,7 @@ import cv2
 def load_image(img_path, resize=True):
     tmp_img = imageio.imread(img_path)
     if resize:
-        return transform.resize(image=tmp_img,output_shape=(200,200))
+        return transform.resize(image=tmp_img,output_shape=(200,200),anti_aliasing=True, mode='constant')
     return tmp_img
 
 # x = x.reshape(x.shape[0], -1).astype('float32')
