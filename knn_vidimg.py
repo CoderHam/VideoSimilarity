@@ -10,6 +10,8 @@ from collections import Counter
 import cv2
 import glob
 import knn_gpu
+import re
+from sklearn.metrics import accuracy_score
 
 def load_image(img_path, resize=True):
     tmp_img = imageio.imread(img_path)
@@ -39,5 +41,25 @@ def run_vid2img(vid2img_list,k,flat=True):
 
     return I
 
+def get_class_from_path(vid_path):
+    return re.search('vid2img/(.*)_', vid_path, re.IGNORECASE).group(1)
+
+def get_classes_from_indices(vid2img_list,vidIndices,label=True):
+    classes = []
+    for i,vidIndex in enumerate(vidIndices):
+        # classes = [get_class_from_path(vid2img_list[j]) for j in vidIndex]
+        voted_classes = [j//10 for j in vidIndex]
+        if label:
+            classes.append(Counter(voted_classes).most_common(1)[0][0])
+        else:
+            classes.append(voted_classes)
+    return classes
+
+def get_accuracy(vid2img_list,vidIndices):
+    pred = get_classes_from_indices(vid2img_list,vidIndices)
+    actual = [j//10 for j in range(70)]
+    return accuracy_score(actual, pred)
+
 # vid2img_list = sorted(glob.glob('data/vid2img/*.jpg'))
-# run_vid2img(vid2img_list,5)
+# vidIndices = run_vid2img(vid2img_list,3)
+# print("Accuracy:",get_accuracy(vid2img_list,vidIndices))
