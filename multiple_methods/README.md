@@ -26,4 +26,10 @@ There is an option to extract only a certain number of features as well, which c
 
 ## Training Models 
 
-Run train.py  
+Run `train.py` to run either : Long term Recurrent Convolutional Network, LSTM or a Multi Layer Perceptron network.
+
+SOME NOTES: 
+- The number of classes in the `train.py` script has been hardcoded to 10 which can be set to the number as desired from 1-101. 
+- The dimensions for the image are hardcoded as per what has been extracted earlier using `extract_frames.py` for now since the UCF101 is a standard dataset and must be changed for other datasets accordingly.
+- The hyperparameters such as : dropout rate, number of strides, number of layers, activation functions etc have been set to the best possible values post hyper parameter tuning 
+- Each model takes a few hours to run even on a GPU given the suze of the dataset.
