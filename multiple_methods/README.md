@@ -22,4 +22,8 @@ For all 101 features, this script took around 2 hours on a p2.xlarge EC2 instanc
 
 WARNING : The extracted train+test folders will be around 21GB 
 
-There is an option to extract only a certain number of features as well, which can be set with `class_limit` variable within the script. 
+There is an option to extract only a certain number of features as well, which can be set with `class_limit` variable within the script.
+
+## Training Models 
+
+Run train.py  
