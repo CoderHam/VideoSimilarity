@@ -15,6 +15,7 @@ import os
 import argparse
 import pickle
 from ffprobe3 import FFProbe
+import h5py
 
 # custom imports
 import FFMPEGFrames
@@ -70,7 +71,6 @@ def get_vector(image_name, model):
         resnet_model(t_img)
         h.remove()
     elif model == 'alexnet':
-        print('using alexnet...')
         # 3. Create a vector of zeros that will hold our feature vector
         #    The 'classifier' layer has an output size of 1000
         my_embedding = torch.zeros(1000)
@@ -82,28 +82,33 @@ def get_vector(image_name, model):
         alexnet_model(t_img)
         h.remove()
     # 8. Return the feature vector
-    return my_embedding
+    return np.array(my_embedding)
 
-
-features = {}
+# extract frames and extract features for each frame
+output_filename = output + '.hdf5'
+extracted_features = h5py.File(output_filename, "w")
 # loop through all the videos in input directory
 for path, subdirs, files in os.walk(input):
     for name in files:
+        # print(os.path.join(path, name))
         # get directory paths and video lengths
         video_length = int(float(FFProbe(os.path.join(path, name)).video[0].duration)) + 1
         fps = int(n_frames)/video_length
         video_path = os.path.join(path, name)
-        f = FFMPEGFrames.FFMPEGFrames(output)
+        frames_output = 'data/video_frames'
+        f = FFMPEGFrames.FFMPEGFrames(frames_output)
         f.extract_frames(os.path.join(path, name), fps)
         # get feature vectors for each frame image
         frames_path = f.full_output
         frames = os.listdir(frames_path)
-        model = 'resnet'
-        features[video_path] = [get_vector(os.path.join(frames_path, frame), model) for frame in frames]
+        feature_matrix = np.array([get_vector(os.path.join(frames_path, frame), model) for frame in frames])
+        for frame in frames:
+            feature_matrix = np.array(get_vector(os.path.join(frames_path, frame), model))
+            full_path = os.path.join(video_path, frame)
+            extracted_features.create_dataset(full_path, data=feature_matrix)
         # delete rest of the files after extracting image features
         if delete:
             shutil.rmtree(f.full_output)
 
-# save feature vectors
-with open('features.pickle', 'wb') as handle:
-    pickle.dump(features, handle, protocol=pickle.HIGHEST_PROTOCOL)
+# close the hdf5 file
+extracted_features.close()
