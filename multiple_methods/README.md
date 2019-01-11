@@ -13,3 +13,13 @@ Now you can run the scripts in the data folder to move the videos to the appropr
 `python create_train_test.py`
 
 `python extract_frames.py`
+
+## Extracting features
+
+To be able to the Multi Layer Perceptron and LSTM mdoels, we need to extract features from the images with the CNN. This is done by running `extract_features.py`. 
+
+For all 101 features, this script took around 2 hours on a p2.xlarge EC2 instance on AWS which had a GPU and about 16GB of space(which spilled over and had to be rescaled) 
+
+WARNING : The extracted train+test folders will be around 21GB 
+
+There is an option to extract only a certain number of features as well, which can be set with `class_limit` variable within the script. 
