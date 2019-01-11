@@ -1,9 +1,10 @@
 """
-Train our RNN on extracted features or images.
+This script utilises the Dataset types defined in data.py to either use image frames or image features 
+to train different types of networks defined in networks.py
 """
-from keras.callbacks import TensorBoard, ModelCheckpoint, EarlyStopping, CSVLogger
-from models import ResearchModels
+from networks import ResearchModels
 from data import DataSet
+from keras.callbacks import TensorBoard, ModelCheckpoint, EarlyStopping, CSVLogger
 import time
 import os.path
 
@@ -13,7 +14,7 @@ def train(data_type, seq_length, model, saved_model=None,
     # Helper: Save the model.
     checkpointer = ModelCheckpoint(
         filepath=os.path.join('data', 'checkpoints', model + '-' + data_type + \
-            '.{epoch:03d}-{val_loss:.3f}.hdf5'),
+            '.{epoch:}-{val_loss:}.hdf5'),
         verbose=1,
         save_best_only=True)
 
@@ -83,24 +84,24 @@ def train(data_type, seq_length, model, saved_model=None,
 def main():
     """These are the main training settings. Set each before running
     this file."""
-    # model can be one of lstm, lrcn, mlp, conv_3d, c3d
+    # model can be one of mlp, lstm, long_term_rcn
     model = 'lstm'
     saved_model = None  # None or weights file
-    class_limit = None  # int, can be 1-101 or None
+    class_limit = 10  # can be 1-101 or None
     seq_length = 40
     load_to_memory = False  # pre-load the sequences into memory
     batch_size = 32
     nb_epoch = 1000
 
-    # Chose images or features and image shape based on network.
-    if model in ['conv_3d', 'c3d', 'lrcn']:
+    # Chose images or features and image shape based on type of network
+    if model in ['long_term_rcn']:
         data_type = 'images'
         image_shape = (80, 80, 3)
     elif model in ['lstm', 'mlp']:
         data_type = 'features'
         image_shape = None
     else:
-        raise ValueError("Invalid model. See train.py for options.")
+        raise ValueError("Invalid model!!!!!")
 
     train(data_type, seq_length, model, saved_model=saved_model,
           class_limit=class_limit, image_shape=image_shape,
