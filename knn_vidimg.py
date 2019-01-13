@@ -30,7 +30,7 @@ def build_vector(vid2img_list):
             img_vectors = np.vstack((img_vectors, img_x))
     return img_vectors
 
-def run_vid2img(vid2img_list,k,flat=True):
+def run_knn_vid2img(vid2img_list,k,flat=True):
     img_vectors = build_vector(vid2img_list)
     nb, d = img_vectors.shape
     print("Number of records:",nb, "\nNumber of dimensions:",d)
