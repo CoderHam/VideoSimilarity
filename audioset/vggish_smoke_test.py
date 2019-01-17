@@ -55,11 +55,10 @@ freq = 1000
 sr = 44100
 t = np.linspace(0, num_secs, int(num_secs * sr))
 x = np.sin(2 * np.pi * freq * t)
-print(x.shape)
 
 # Produce a batch of log mel spectrogram examples.
 input_batch = vggish_input.waveform_to_examples(x, sr)
-print(input_batch[0].shape)
+print(input_batch.shape)
 
 print('Log Mel Spectrogram example: ', input_batch[0])
 np.testing.assert_equal(

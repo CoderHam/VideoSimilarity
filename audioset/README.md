@@ -122,7 +122,7 @@ VGGish can be used in two ways:
   trained classifier with any arbitrary audio input by running the audio through
   the audio feature extractor and VGGish model provided here, passing the
   resulting embedding features as input to your trained model.
-  `vggish_inference_demo.py` shows how to produce VGGish embeddings from
+  `vggish_inference.py` shows how to produce VGGish embeddings from
   arbitrary audio.
 
 * *As part of a larger model*: Here, we treat VGGish as a "warm start" for the
@@ -141,7 +141,7 @@ The VGGish code layout is as follows:
 * `vggish_input.py`: Converter from audio waveform into input examples.
 * `mel_features.py`: Audio feature extraction helpers.
 * `vggish_postprocess.py`: Embedding postprocessing.
-* `vggish_inference_demo.py`: Demo of VGGish in inference mode.
+* `vggish_inference.py`: Demo of VGGish in inference mode.
 * `vggish_train_demo.py`: Demo of VGGish in training mode.
 * `vggish_smoke_test.py`: Simple test of a VGGish installation
 
@@ -204,7 +204,7 @@ released visual and audio embeddings for millions of YouTube videos in the same
 PCA/whitened/quantized format.
 
 We provide a Python implementation of the postprocessing which can be applied to
-batches of embeddings produced by VGGish. `vggish_inference_demo.py` shows how
+batches of embeddings produced by VGGish. `vggish_inference.py` shows how
 the postprocessor can be run after inference.
 
 If you don't need to use the released embeddings or YouTube-8M, then you could
