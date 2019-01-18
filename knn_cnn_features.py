@@ -10,12 +10,18 @@ import cv2
 import glob
 import knn_gpu
 
-def run_knn_features(feature_vectors,k,flat=True):
+def run_knn_features(feature_vectors,test_vectors=None,k=5,flat=True):
     nb, d = feature_vectors.shape
     print("Number of records:",nb, "\nNumber of dimensions:",d)
-    if flat:
-        D, I = knn_gpu.knn_flat(feature_vectors, feature_vectors, d, k)
+    if test_vectors==None:
+        if flat:
+            D, I = knn_gpu.knn_flat(feature_vectors, feature_vectors, d, k)
+        else:
+            D, I = knn_gpu.knn_ivf(feature_vectors, feature_vectors, d, k)
     else:
-        D, I = knn_gpu.knn_ivf(feature_vectors, feature_vectors, d, k)
+        if flat:
+            D, I = knn_gpu.knn_flat(feature_vectors, test_vectors, d, k)
+        else:
+            D, I = knn_gpu.knn_ivf(feature_vectors, test_vectors, d, k)
 
     return I
