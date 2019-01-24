@@ -106,3 +106,7 @@ venv.bak/
 data/tmp
 audioset/vggish_model.ckpt
 audioset/vggish_pca_params.npz
+data/UCF101.rar
+data/UCF101/
+features_UCF_resnet50.h5
+merged_features_UCF_resnet50.h5
