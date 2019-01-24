@@ -1,8 +1,8 @@
 # VideoSimilarity
 
-## My experiments on similarity metrics for videos (and images)
+## Experiments on similarity metrics for videos (and images)
 
-### Color based similarity
+### 1. Color based similarity - [color_similarity.ipynb](https://github.com/CoderHam/VideoSimilarity/blob/master/color_similarity.ipynb)
 
 A Faster - *GPU* based implementation of **k-means clustering** - is used for getting the dominant color.
 
@@ -29,11 +29,11 @@ The next step is to concatenate these **100** pixel images for each frame (sampl
 
 This compressed image representation is thereafter used to find similar images using either the **MSE** or **SSIM** similarity metric or by using the **KNN** algorithm.
 
-PS: For the current experiments, **L** and **n** is variable but I have used a script to extract a fixed number of frames **(20)** for each video. Thus the new image representation is **20 x 100 x 3** [since there are 3 channels (RGB)].
+PS: For the current experiments, **L** and **n** is variable but I have used a script to extract a fixed number of frames **(20)** for each video. Thus the new image representation is **20 x 100 x 3** [since there are **3** channels (RGB)].
 
 I have extracted this image representation for the videos in [`data/videos`](https://github.com/CoderHam/VideoSimilarity/tree/master/data/videos) and will now use KNN to return k-similar neighbors.
 
-### KNN similarity search
+### KNN similarity search on (vid2img representations)
 
 We cluster smaller images / features and use the faiss - *GPU* implementation instead of sklearn and store them in [`data/vid2img`](https://github.com/CoderHam/VideoSimilarity/tree/master/data/vid2img).
 
@@ -48,6 +48,27 @@ Thereafter, I ran the KNN GPU implementation on the image representations in [`d
 The dimensionality is **6000** since (*20 x 100 = 2000* pixels and RBG (*3*) values for each pixel).
 
 The runtime for the KNN search with **k = 3** (build and run on all videos) for this subset of **70** videos is **132 ms** and we can be sure that this will scale effectively based on previous experiments.
+
+### 2. Feature based similarity - [feature_similarity.ipynb](https://github.com/CoderHam/VideoSimilarity/blob/master/feature_similarity.ipynb)
+
+The [extract_features.py](extract_features.py) script (Pytorch), extracts CNN features/embeddings using a pre-trained Resnet50 model. The feature vector is **2048** dimensional. Since the UCF101 dataset has a median video length of **8** seconds.
+
+For **1000** image feature vectors takes the KNN search with k=3 takes **94.9** ms. We extract the features for all **13320** videos with **8** uniformly sampled frames each and extract feature vectors from each such frame. The process takes nearly 1 hour and the results are stored in [features_UCF_resnet50.h5](https://drive.google.com/open?id=1h6Jv28NXkD-_Hyb3XXjomDtu3jLKKdb6). This has the **8 x 2048** matrix for each video with the video path as the key (data/UCF101/<video_name>.avi).
+
+Since we need the merged numpy array we also create a merged feature vector of shape **106557 x 2048** and store it in [merged_features_UCF_resnet50.h5](https://drive.google.com/open?id=1bWBQ98mlcbt_sr4ipAlM0mdWy7PkdSgZ). The features are stores in a `feature_vectors` and corresponding labels are stored in `feature_labels`.
+
+Performing the KNN similarity search with **k=3** takes **18** seconds. (This includes **100,000** queries as well, one for each frame).
+
+The **class-wise accuracy** is then calculated and it comes to **0.964**.
+
+**TODO:**
+1. Try validation using train test splits and report performance.
+2. Reduce the number of queries to 10 and test speed.
+3. Test with k = 10, 100, 200 etc.
+
+### Sound based similarity - [sound_similarity.ipynb](https://github.com/CoderHam/VideoSimilarity/blob/master/sound_similarity.ipynb)
+
+The word is based on the `audioset` dataset and `VGGish` model trained by Google (Tensorflow). The pipeline follow subsampling of audio to a standard form followed by creating a `log mel-spectrogram` of size **(96, 64)**. This is then fed into the pre-trained VGGish model that returns a **128** dimensional embedding.
 
 ### Extra - Using Wavelet image hash for similarity search (Not currently using):
 
