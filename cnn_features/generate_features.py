@@ -1,3 +1,13 @@
+"""
+This script extracts features from videos and saves it to a Python pickle file.
+
+i = input, path to the videos
+n = nframes, number of frames to extract from each video
+d = delete, if True, deletes the extracted frames
+o = output, name of the output hd5f file
+m = model, name of the model to be used in feature extraction
+"""
+
 # import torch and other libraries
 import torch
 import torch.nn as nn
@@ -15,7 +25,6 @@ import os
 import argparse
 import pickle
 from ffprobe3 import FFProbe
-import h5py
 
 # custom imports
 import FFMPEGFrames
@@ -85,8 +94,10 @@ def get_vector(image_name, model):
     return np.array(my_embedding)
 
 # extract frames and extract features for each frame
-output_filename = output + '.hdf5'
-extracted_features = h5py.File(output_filename, "w")
+features = []
+ind2path_labels = {}
+path2ind_labels = {}
+ind = 0
 # loop through all the videos in input directory
 for path, subdirs, files in os.walk(input):
     for name in files:
@@ -96,6 +107,7 @@ for path, subdirs, files in os.walk(input):
         fps = int(n_frames)/video_length
         video_path = os.path.join(path, name)
         frames_output = 'data/video_frames'
+        # frames_output = '/mnt/e/ucf_101_frames/'
         f = FFMPEGFrames.FFMPEGFrames(frames_output)
         f.extract_frames(os.path.join(path, name), fps)
         # get feature vectors for each frame image
@@ -105,10 +117,17 @@ for path, subdirs, files in os.walk(input):
         for frame in frames:
             feature_matrix = np.array(get_vector(os.path.join(frames_path, frame), model))
             full_path = os.path.join(video_path, frame)
-            extracted_features.create_dataset(full_path, data=feature_matrix)
+            features.append(feature_matrix)
+            ind2path_labels[ind] = full_path
+            path2ind_labels[full_path] = ind
+            ind += 1
         # delete rest of the files after extracting image features
-        if delete:
+        if delete == True:
+            print('deleting frames subdirectory...')
             shutil.rmtree(f.full_output)
 
-# close the hdf5 file
-extracted_features.close()
+# convert to numpy matrix and save
+features_file = [np.array(features), ind2path_labels, path2ind_labels]
+output_filename = output + '.pickle'
+with open(output_filename, 'wb') as handle:
+    pickle.dump(features_file, handle, protocol=pickle.HIGHEST_PROTOCOL)
