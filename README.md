@@ -1,6 +1,8 @@
 # VideoSimilarity
 
-This code generates feature vectors from videos in `data/videos/` folder using pre-trained models from PyTorch. It extracts specified number of frames from each video and uses PyTorch's pretrained models (Resnet18 or Alexnet) on each video frame, and saves the feature vector into an hdf5 file.
+This code generates feature vectors from videos in `data` folder using pre-trained models from PyTorch. It extracts specified number of frames from each video and uses PyTorch's pretrained models (Resnet18 or Alexnet) on each video frame, and saves the feature vector and the index to video frame path to a pickle file.
+
+It also contains script that performs k-nearest neighbor search on the videos using extracted features. 
 
 ## Downloading the UCF-101 Data
 
