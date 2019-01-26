@@ -2,7 +2,7 @@ import numpy as np
 import faiss
 
 ## Using a flat index
-def knn_flat(vector_x, queries_x, d, k):
+def knn_flat(vector_x, queries_x, d, k, verbose):
     res = faiss.StandardGpuResources()  # use a single GPU
     index_flat = faiss.IndexFlatL2(d)  # build a flat (CPU) index
 
@@ -10,14 +10,15 @@ def knn_flat(vector_x, queries_x, d, k):
     gpu_index_flat = faiss.index_cpu_to_gpu(res, 0, index_flat)
 
     gpu_index_flat.add(vector_x)         # add vectors to the index
-    print("Running with Flat index for",gpu_index_flat.ntotal,"records of with dimensionality",d)
+    if verbose:
+        print("Running with Flat index for",gpu_index_flat.ntotal,"records of with dimensionality",d)
 
     # we want to see the k nearest neighbors
     D, I = gpu_index_flat.search(queries_x, k)  # actual search
     return D, I
 
 # Using an IVF index
-def knn_ivf(vector_x, queries_x, d, k):
+def knn_ivf(vector_x, queries_x, d, k, verbose):
     nlist = 100
     quantizer = faiss.IndexFlatL2(d)  # the other index
     index_ivf = faiss.IndexIVFFlat(quantizer, d, nlist, faiss.METRIC_L2)
@@ -36,7 +37,7 @@ def knn_ivf(vector_x, queries_x, d, k):
     D, I = gpu_index_ivf.search(queries_x, k)  # actual search
     return D, I
 
-def run(k,flat=True):
+def run(k,flat=True,verbose=False):
     # create fake data
     d = 200                           # dimensionality
     nb = 1000000                      # number of records
@@ -49,9 +50,9 @@ def run(k,flat=True):
 
     # perform knn search
     if flat:
-        D, I = knn_flat(vector_x, queries_x, d, k)
+        D, I = knn_flat(vector_x, queries_x, d, k, verbose=verbose)
     else:
-        D, I = knn_ivf(vector_x, queries_x, d, k)
+        D, I = knn_ivf(vector_x, queries_x, d, k, verbose=verbose)
     # print(I[:5])                   # neighbors of the 5 first queries
     # print(list(zip(D[:5],I[:5])))
 
