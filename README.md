@@ -59,12 +59,21 @@ Since we need the merged numpy array we also create a merged feature vector of s
 
 Performing the KNN similarity search with **k=3** takes **18** seconds. (This includes **100,000** queries as well, one for each frame).
 
-The **class-wise accuracy** is then calculated and it comes to **0.964**.
+The **class-wise accuracy** is then calculated and it comes to **96.4%**.
 
-**TODO:**
-1. Try validation using train test splits and report performance.
-2. Reduce the number of queries to 10 and test speed.
-3. Test with k = 10, 100, 200 etc.
+**Tests:**
+1. **Validation using train-test split (70:30):**
+
+Therefore we see that by taking a **70:30** split for train and test we still get a class-wise accuracy of **91.6%** (as compared to **96.4%** for all the data) for the **101** classes. Which is still good!
+
+Moreover the time reduces from **17.3** s to **3.9** s when queries reduces from **100,000** to **30,000**.
+2. **Number of queries = 100, 10, 1**
+
+The time reduces to approx **0.2** s for 100, 10 and 1 query. This will allow us to run our KNN similarity search in **real-time**!
+
+3. **With k = 10, 100, 200**
+
+As we can see the KNN similarity search scales well with the value of **k**. A single query on the **100,000** datapoints of dimensionality **2048** takes approximately **0.3** s each for **k = 3, 10, 100, 200**. Still runnable in real-time!
 
 ### Sound based similarity - [sound_similarity.ipynb](https://github.com/CoderHam/VideoSimilarity/blob/master/sound_similarity.ipynb)
 
