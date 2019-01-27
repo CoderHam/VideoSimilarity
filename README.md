@@ -73,7 +73,7 @@ The time reduces to approx **0.2** s for 100, 10 and 1 query. This will allow us
 
 3. **With k = 10, 100, 200**
 
-As we can see the KNN similarity search scales well with the value of **k**. A single query on the **100,000** datapoints of dimensionality **2048** takes approximately **0.3** s each for **k = 3, 10, 100, 200**. Still runnable in real-time!
+As we can see the KNN similarity search scales well with the value of **k**. A single query on the **100,000** datapoints of dimensionality **2048** takes approximately **0.2** s each for **k = 3, 10, 100, 200**. Still runnable in real-time!
 
 ### Sound based similarity - [sound_similarity.ipynb](https://github.com/CoderHam/VideoSimilarity/blob/master/sound_similarity.ipynb)
 
