@@ -110,3 +110,6 @@ data/UCF101.rar
 data/UCF101/
 features_UCF_resnet50.h5
 merged_features_UCF_resnet50.h5
+audioset/data/
+audioset_balanced_labels.npy
+audioset_balanced_features_vggish.h5
