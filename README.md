@@ -61,23 +61,31 @@ Performing the KNN similarity search with **k=3** takes **18** seconds. (This in
 
 The **class-wise accuracy** is then calculated and it comes to **96.4%**.
 
-**Tests:**
-1. **Validation using train-test split (70:30):**
+**KNN feature similarity tests:-**
+
+**1. Validation using train-test split (70:30):**
 
 Therefore we see that by taking a **70:30** split for train and test we still get a class-wise accuracy of **91.6%** (as compared to **96.4%** for all the data) for the **101** classes. Which is still good!
 
-Moreover the time reduces from **17.3** s to **3.9** s when queries reduces from **100,000** to **30,000**.
-2. **Number of queries = 100, 10, 1**
+Moreover the time reduces from **17.3** seconds to **3.9** seconds when queries reduces from **100,000** to **30,000**.
 
-The time reduces to approx **0.2** s for 100, 10 and 1 query. This will allow us to run our KNN similarity search in **real-time**!
+**2. Number of queries = 100, 10, 1**
 
-3. **With k = 10, 100, 200**
+The time reduces to approx **0.2** seconds for 100, 10 and 1 query. This will allow us to run our KNN similarity search in **real-time**!
+
+**3. With k = 10, 100, 200**
 
 As we can see the KNN similarity search scales well with the value of **k**. A single query on the **100,000** datapoints of dimensionality **2048** takes approximately **0.2** s each for **k = 3, 10, 100, 200**. Still runnable in real-time!
 
-### Sound based similarity - [sound_similarity.ipynb](https://github.com/CoderHam/VideoSimilarity/blob/master/sound_similarity.ipynb)
+### 3. Sound based similarity - [sound_similarity.ipynb](https://github.com/CoderHam/VideoSimilarity/blob/master/sound_similarity.ipynb)
 
-The word is based on the `audioset` dataset and `VGGish` model trained by Google (Tensorflow). The pipeline follow subsampling of audio to a standard form followed by creating a `log mel-spectrogram` of size **(96, 64)**. This is then fed into the pre-trained VGGish model that returns a **128** dimensional embedding.
+The word is based on the `audioset` dataset and `VGGish` model trained by Google (Tensorflow). The pipeline follow subsampling of audio to a standard form followed by creating a `log mel-spectrogram` of size **(96, 64)** for each second. This is then fed into the pre-trained VGGish model that returns a **128** dimensional embedding for each second of audio. It is important to not that all audio clips in this dataset are on **10** seconds each. We use the balanced train split of the audioset data to test the performance which comprises of **21,782** audio clips.
+
+The embeddings from the `.tfrecord` files are read from disk and preprocessed. Since we need the merged numpy array we created a merged audio embedding matrix of shape **21,782 x 10 x 128** and stored it in [audioset_balanced_features_vggish.h5](https://drive.google.com/file/d/1oepvdCfpw8RuAk8AppIHvKUxqTBz5S1N/view?usp=sharing). The features are stores in a `audio_embeddings` and corresponding label(s) for each audio clip is stored in [audioset_balanced_labels.npy](https://drive.google.com/file/d/1xsL8IQAZ9i8-1AIYCd5FP0Vb9Meixbro/view?usp=sharing).
+
+Performing the KNN similarity search with **k=3** takes **0.5** seconds. (This includes **20,000** queries as well, one for each audio clip).
+
+The **class-wise accuracy** is then calculated and it comes to **47.3%** (for **448** classes when assuming only first label).
 
 ### Extra - Using Wavelet image hash for similarity search (Not currently using):
 
