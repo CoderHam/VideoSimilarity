@@ -1,13 +1,7 @@
 import numpy as np
-import time
 import faiss
 import sys
 
-import imageio
-from skimage import transform
-from collections import Counter
-import cv2
-import glob
 import knn_gpu
 
 def run_knn_features(feature_vectors,test_vectors=None,k=5,flat=True,verbose=False):
