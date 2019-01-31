@@ -13,6 +13,13 @@ I used Facebook’s [**faiss**](https://github.com/facebookresearch/faiss) GPU i
 
 ![Runtime of k-means clustering on a 200x200x3 image (seconds)](https://github.com/CoderHam/VideoSimilarity/blob/master/plots/chart.png)
 
+|Number of clusters (k)|Runtime with CPU (s)|Runtime with GPU (s)|
+|---|---|--|
+|5|4|0.3|
+|10|18|0.3|
+|20|45|0.3|
+|50|141|0.3|
+
 As we can see, using a GPU gives a massive performance boost in this case from **13x** to nearly **500x** as the cluster size (k) increases from **5** to **50**. We see sklearn takes exponentially more time and a GPU definitely speeds up this process. Although the algorithms are not exactly the same, the performance and quality of results are comparable and the speedup is worth the minor loss in accuracy.
 
 **PS:** _In all experiments, the runtime includes the time to load the image and cluster it._
@@ -47,17 +54,17 @@ Thereafter, I ran the KNN GPU implementation on the image representations in [`d
 
 The dimensionality is **6000** since (*20 x 100 = 2000* pixels and RBG (*3*) values for each pixel).
 
-The runtime for the KNN search with **k = 3** (build and run on all videos) for this subset of **70** videos is **132 ms** and we can be sure that this will scale effectively based on previous experiments.
+The runtime for the KNN search with **K=3** (build and run on all videos) for this subset of **70** videos is **132 ms** and we can be sure that this will scale effectively based on previous experiments.
 
 ### 2. Feature based similarity - [feature_similarity.ipynb](https://github.com/CoderHam/VideoSimilarity/blob/master/feature_similarity.ipynb)
 
 The [extract_features.py](extract_features.py) script (Pytorch), extracts CNN features/embeddings using a pre-trained Resnet50 model. The feature vector is **2048** dimensional. Since the UCF101 dataset has a median video length of **8** seconds.
 
-For **1000** image feature vectors takes the KNN search with k=3 takes **94.9** ms. We extract the features for all **13320** videos with **8** uniformly sampled frames each and extract feature vectors from each such frame. The process takes nearly 1 hour and the results are stored in [features_UCF_resnet50.h5](https://drive.google.com/open?id=1h6Jv28NXkD-_Hyb3XXjomDtu3jLKKdb6). This has the **8 x 2048** matrix for each video with the video path as the key (data/UCF101/<video_name>.avi).
+For **1000** image feature vectors takes the KNN search with K=3 takes **94.9** ms. We extract the features for all **13320** videos with **8** uniformly sampled frames each and extract feature vectors from each such frame. The process takes nearly 1 hour and the results are stored in [features_UCF_resnet50.h5](https://drive.google.com/open?id=1h6Jv28NXkD-_Hyb3XXjomDtu3jLKKdb6). This has the **8 x 2048** matrix for each video with the video path as the key (data/UCF101/<video_name>.avi).
 
 Since we need the merged numpy array we also create a merged feature vector of shape **106557 x 2048** and store it in [merged_features_UCF_resnet50.h5](https://drive.google.com/open?id=1bWBQ98mlcbt_sr4ipAlM0mdWy7PkdSgZ). The features are stores in a `feature_vectors` and corresponding labels are stored in `feature_labels`.
 
-Performing the KNN similarity search with **k=3** takes **18** seconds. (This includes **100,000** queries as well, one for each frame).
+Performing the KNN similarity search with **K=3** takes **18** seconds. (This includes **100,000** queries as well, one for each frame).
 
 The **class-wise accuracy** is then calculated and it comes to **96.4%**.
 
@@ -73,9 +80,22 @@ Moreover the time reduces from **17.3** seconds to **3.9** seconds when queries 
 
 The time reduces to approx **0.2** seconds for 100, 10 and 1 query. This will allow us to run our KNN similarity search in **real-time**!
 
-**3. With k = 10, 100, 200**
+|No. of Queries|Runtime (s)|
+|---|---|
+|1|0.2|
+|10|0.2|
+|100|0.2|
 
-As we can see the KNN similarity search scales well with the value of **k**. A single query on the **100,000** datapoints of dimensionality **2048** takes approximately **0.2** s each for **k = 3, 10, 100, 200**. Still runnable in real-time!
+**3. With K = 10, 100, 200**
+
+|Value of K|Runtime (s)|
+|---|---|
+|3|0.2|
+|10|0.2|
+|100|0.2|
+|200|0.2|
+
+As we can see the KNN similarity search scales well with the value of **K**. A single query on the **100,000** datapoints of dimensionality **2048** takes approximately **0.2** s each for **K = 3, 10, 100, 200**. Still runnable in real-time!
 
 ### 3. Sound based similarity - [sound_similarity.ipynb](https://github.com/CoderHam/VideoSimilarity/blob/master/sound_similarity.ipynb)
 
@@ -83,7 +103,7 @@ The word is based on the `audioset` dataset and `VGGish` model trained by Google
 
 The embeddings from the `.tfrecord` files are read from disk and preprocessed. Since we need the merged numpy array we created a merged audio embedding matrix of shape **21,782 x 10 x 128** and stored it in [audioset_balanced_features_vggish.h5](https://drive.google.com/file/d/1oepvdCfpw8RuAk8AppIHvKUxqTBz5S1N/view?usp=sharing). The features are stores in a `audio_embeddings` and corresponding label(s) for each audio clip is stored in [audioset_balanced_labels.npy](https://drive.google.com/file/d/1xsL8IQAZ9i8-1AIYCd5FP0Vb9Meixbro/view?usp=sharing).
 
-Performing the KNN similarity search with **k=3** takes **0.5** seconds. (This includes **20,000** queries as well, one for each audio clip).
+Performing the KNN similarity search with **K=3** takes **0.5** seconds. (This includes **20,000** queries as well, one for each audio clip).
 
 The **class-wise accuracy** is then calculated and it comes to **47.3%** (for **448** classes when assuming only first label).
 
