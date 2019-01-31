@@ -115,3 +115,4 @@ audioset_balanced_labels.npy
 audioset_balanced_features_vggish.h5
 color_UCF_vid2img.h5
 data/vid2img/*.npy
+data/audio/
