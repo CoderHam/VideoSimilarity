@@ -17,20 +17,25 @@ def embedding_from_audio(wav_path):
     _, audio_embedding = vggish_inference.main(wav_file=wav_path)
     return audio_embedding
 
-def load_sound_data():
+def load_sound_data(second_level=False,length=10):
     audioset_h5f = h5py.File('audioset_balanced_features_vggish.h5', 'r')
     audio_embeddings = np.array(audioset_h5f['audio_embeddings'],dtype='float32')
     audioset_h5f.close()
     true_labels = np.load('audioset_balanced_labels.npy')
     feature_labels = np.array([flab[0] for flab in true_labels])
-    reshaped_audio_embeddings = audio_embeddings.reshape(audio_embeddings.shape[:-2] + (-1,))
-    return reshaped_audio_embeddings, feature_labels, true_labels
+    if second_level:
+        merged_audio_embeddings = audio_embeddings.reshape(audio_embeddings.shape[:-3] + (-1,128))
+        embedding_labels = np.array([i for i in feature_labels for _ in range(length)])
+        true_labels = np.array([i for i in true_labels for _ in range(length)])
+        return merged_audio_embeddings, embedding_labels, true_labels
+    else:
+        reshaped_audio_embeddings = audio_embeddings.reshape(audio_embeddings.shape[:-2] + (-1,))
+        return reshaped_audio_embeddings, feature_labels, true_labels
 
 def similar_sound_vids(vid_path, k=100):
     extract_audio_from_video(vid_path)
     audio_embedding = embedding_from_audio('data/audio/'+vid_path.split('/')[-1].split('.')[0]+'.wav')
     audioset_bal_embeddings, feature_labels, _ = load_sound_data()
-    import knn_cnn_features
     feature_indices = knn_cnn_features.run_knn_features(audioset_bal_embeddings,\
                                                     test_vectors=audio_embedding,k=k)
     return feature_labels[feature_indices]
