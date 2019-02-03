@@ -55,6 +55,7 @@ import vggish_input
 import vggish_params
 import vggish_postprocess
 import vggish_slim
+tf.logging.set_verbosity(tf.logging.ERROR)
 
 # flags = tf.app.flags
 #

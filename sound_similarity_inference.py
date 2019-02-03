@@ -8,13 +8,18 @@ import vggish_inference
 
 def extract_audio_from_video(vid_path):
     vid_name = vid_path.split('/')[-1].split('.')[0]
-    p = subprocess.Popen("rm -r data/audio/*.wav && ffmpeg -i "+vid_path+" -f wav -vn data/audio/"+vid_name+".wav",
+    p = subprocess.Popen("ffmpeg -i "+vid_path+" -f wav -vn data/audio/"+vid_name+".wav",
                          stdout=subprocess.PIPE, shell=True)
     (output, err) = p.communicate()
     p_status = p.wait()
 
-def embedding_from_audio(wav_path):
+def embedding_from_audio(wav_path, delete=True):
     _, audio_embedding = vggish_inference.main(wav_file=wav_path)
+    if delete:
+        p = subprocess.Popen("rm -r "+wav_path,
+                             stdout=subprocess.PIPE, shell=True)
+        (output, err) = p.communicate()
+        p_status = p.wait()
     return audio_embedding
 
 def load_sound_data(second_level=False,length=10):
