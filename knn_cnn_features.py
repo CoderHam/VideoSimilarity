@@ -4,7 +4,7 @@ import sys
 
 import knn_gpu
 
-def run_knn_features(feature_vectors,test_vectors=None,k=5,flat=True,verbose=False):
+def run_knn_features(feature_vectors,test_vectors=None,k=5,flat=True,verbose=False,dist=False):
     nb, d = feature_vectors.shape
     if type(test_vectors) is not np.ndarray:
         if flat:
@@ -17,4 +17,7 @@ def run_knn_features(feature_vectors,test_vectors=None,k=5,flat=True,verbose=Fal
         else:
             D, I = knn_gpu.knn_ivf(feature_vectors, test_vectors, d, k, verbose)
 
-    return I
+    if dist:
+        return D, I 
+    else:
+        return I

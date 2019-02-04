@@ -68,3 +68,49 @@ def label_from_index(similar_indices, true_indices=None):
         return similar_labels, true_labels
     else:
         return similar_labels
+
+def load_sound_data_ucf():
+    feature_file = h5py.File('audio_sec_UCF_vggish.h5', 'r')
+    feature_labels = np.array([fl.decode() for fl in feature_file['feature_labels']])
+    feature_vectors = np.array(feature_file['feature_vectors'])
+    feature_file.close()
+    return feature_vectors, feature_labels
+
+def get_ordered_unique(listed,dist):
+    seen = set()
+    seen_add = seen.add
+    ordered_listed = [x for x in listed if not (x in seen or seen_add(x))]
+    seen = set()
+    seen_add = seen.add
+    ordered_dist = [x for i, x in enumerate(dist) if not (listed[i] in seen or seen_add(listed[i]))]
+    return ordered_listed, ordered_dist
+
+def multi_sec_inference(distances, feature_indices):
+    length = len(feature_indices)
+    ordered_listed = []
+    ordered_distances = []
+    for i in range(length):
+        ol, od = get_ordered_unique(feature_indices[i],distances[i])
+        ordered_listed = ordered_listed + ol
+        ordered_distances = ordered_distances + od
+    # print(get_ordered_unique(ordered_listed, ordered_distances))
+    sorted_listed = [x for _,x in sorted(zip(ordered_distances, ordered_listed))]
+    uniq_sorted_listed, uniq_sorted_dist = get_ordered_unique(sorted_listed, sorted(ordered_distances))
+    return [usl.split('/')[-1].split('.')[0] for usl in uniq_sorted_listed]
+
+def similar_sound_ucf_video(vid_path, k=10):
+    feature_vectors, feature_labels = load_sound_data_ucf()
+    try:
+        extract_audio_from_video(vid_path)
+        audio_embedding = embedding_from_audio('data/audio/'+vid_path.split('/')[-1].split('.')[0]+'.wav')
+        # print("pass", audio_embedding.shape, feature_vectors.shape)
+        distances, feature_indices = knn_cnn_features.run_knn_features(feature_vectors,\
+                                                    test_vectors=feature_vectors[:10],k=k, dist=True)
+        print(multi_sec_inference(distances,feature_labels[feature_indices])[:k])
+        # return multi_sec_inference(distances,feature_labels[feature_indices])
+        # return feature_labels[feature_indices]
+    except:
+        print("No audio channel found")
+
+# test
+# similar_sound_ucf_video('data/UCF101/v_ApplyEyeMakeup_g01_c01.avi')
