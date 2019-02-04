@@ -104,7 +104,14 @@ def main(wav_file=None, checkpoint='audioset/vggish_model.ckpt', pca_params='aud
   writer = tf.python_io.TFRecordWriter(
       tfrecord_file) if tfrecord_file else None
 
-  with tf.Graph().as_default(), tf.Session() as sess:
+  # with tf.Graph().as_default(), tf.Session() as sess:
+  with tf.Graph().as_default():
+    # config = tf.ConfigProto()
+    # restrict tensorflow memory usage
+    config = tf.ConfigProto(gpu_options=tf.GPUOptions(per_process_gpu_memory_fraction=0.6),\
+        allow_soft_placement=True)
+    config.gpu_options.allow_growth=True
+    sess = tf.Session(config=config)
     # Define the model in inference mode, load the checkpoint, and
     # locate input and output tensors.
     vggish_slim.define_vggish_slim(training=False)
@@ -144,7 +151,7 @@ def main(wav_file=None, checkpoint='audioset/vggish_model.ckpt', pca_params='aud
     # print(seq_example)
     if writer:
       writer.write(seq_example.SerializeToString())
-
+    sess.close()
   if writer:
     writer.close()
   return embedding_batch, postprocessed_batch
