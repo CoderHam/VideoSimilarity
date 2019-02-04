@@ -2,6 +2,7 @@
 
 ## Requirements 
 
+* Python 3.6
 * keras - 1.2.1
 * tensorfow - 1.4.*
 * A GPU
@@ -17,6 +18,17 @@ Penultimate layer of a VGG net for every frame in the video.
 ## Network Architecture 
 
 Word embeddings + Video features both go into a GRU and a caption is generated for every video.
+
+## Running the script
+
+* Get the videos and captions from MSVR wesbite 
+* Extract the features using the extract_features.py script in the spatio_temporal folder of this repo
+* Run Caption_Generator.py
+
+## Caution
+
+* Change the batch size to fit on your machine accordingly
+* Ensure the right versions of CUDA, cudnn are installed to be able to run with the listed keras and tensorflow version
 
 ## TO DO 
 
