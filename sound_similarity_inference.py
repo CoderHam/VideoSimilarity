@@ -107,7 +107,7 @@ def similar_sound_ucf_video(vid_path, k=10):
         distances, feature_indices = knn_cnn_features.run_knn_features(feature_vectors,\
                                                     test_vectors=feature_vectors[:10],k=k, dist=True)
         print(multi_sec_inference(distances,feature_labels[feature_indices])[:k])
-        # return multi_sec_inference(distances,feature_labels[feature_indices])
+        return multi_sec_inference(distances,feature_labels[feature_indices])[:k]
         # return feature_labels[feature_indices]
     except:
         print("No audio channel found")
