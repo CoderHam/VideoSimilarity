@@ -54,9 +54,10 @@ def similar_feature_ucf_video(vid_path, k=10):
     feature_vectors, feature_labels = load_feature_data_ucf()
     vid_feature_vector = extract_features_from_vid(vid_path)
     distances, feature_indices = knn_cnn_features.run_knn_features(\
-        feature_vectors, test_vectors=feature_vectors[:10],k=k, dist=True)
+        feature_vectors, test_vectors=vid_feature_vector,k=k, dist=True)
     # print(len(feature_indices), feature_labels[feature_indices])
     print(multi_sec_inference(distances,feature_labels[feature_indices])[:k])
     return multi_sec_inference(distances,feature_labels[feature_indices])[:k]
 
+# test
 # similar_feature_ucf_video('data/UCF101/v_ApplyEyeMakeup_g01_c01.avi')
