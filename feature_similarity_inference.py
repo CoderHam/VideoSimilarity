@@ -48,23 +48,29 @@ def multi_sec_inference(distances, feature_indices):
     # print(get_ordered_unique(ordered_listed, ordered_distances))
     sorted_listed = [x for _,x in sorted(zip(ordered_distances, ordered_listed))]
     uniq_sorted_listed, uniq_sorted_dist = get_ordered_unique(sorted_listed, sorted(ordered_distances))
-    return [usl.split('/')[-1].split('.')[0] for usl in uniq_sorted_listed]
+    return uniq_sorted_dist, [usl.split('/')[-1].split('.')[0] for usl in uniq_sorted_listed]
 
-def similar_feature_ucf_video(vid_path, k=10):
+def similar_feature_ucf_video(vid_path, k=10, dist=False, verbose=False):
     # feature_vectors, feature_labels = load_feature_data_ucf()
     vid_feature_vector = extract_features_from_vid(vid_path)
     distances, feature_indices = knn_cnn_features.run_knn_features(\
         feature_vectors, test_vectors=vid_feature_vector,k=k, dist=True)
     # print(len(feature_indices), feature_labels[feature_indices])
-    print(multi_sec_inference(distances,feature_labels[feature_indices])[:k])
-    return multi_sec_inference(distances,feature_labels[feature_indices])[:k]
+    merged_similarities = multi_sec_inference(distances,feature_labels[feature_indices])
+    if verbose:
+        print(merged_similarities[1][:k])
+    if dist:
+        return merged_similarities[0][:k], merged_similarities[1][:k]
+    else:
+        return merged_similarities[1][:k]
 
 # load only once
 feature_vectors, feature_labels = load_feature_data_ucf()
+
 # test
 # import time
 # start = time.time()
 # for i in range(10):
-#     similar_feature_ucf_video('data/UCF101/v_ApplyEyeMakeup_g01_c01.avi')
+#     similar_feature_ucf_video('data/UCF101/v_ApplyEyeMakeup_g01_c01.avi',verbose=True)
 # print((time.time()-start)/10)
-# 1.1066886901855468 seconds
+# 0.4931723356246948 seconds

@@ -96,9 +96,9 @@ def multi_sec_inference(distances, feature_indices):
     # print(get_ordered_unique(ordered_listed, ordered_distances))
     sorted_listed = [x for _,x in sorted(zip(ordered_distances, ordered_listed))]
     uniq_sorted_listed, uniq_sorted_dist = get_ordered_unique(sorted_listed, sorted(ordered_distances))
-    return [usl.split('/')[-1].split('.')[0] for usl in uniq_sorted_listed]
+    return uniq_sorted_dist, [usl.split('/')[-1].split('.')[0] for usl in uniq_sorted_listed]
 
-def similar_sound_ucf_video(vid_path, k=10):
+def similar_sound_ucf_video(vid_path, k=10, dist=False, verbose=False):
     # feature_vectors, feature_labels = load_sound_data_ucf()
     try:
         extract_audio_from_video(vid_path)
@@ -106,9 +106,13 @@ def similar_sound_ucf_video(vid_path, k=10):
         # print("pass", audio_embedding.shape, feature_vectors.shape)
         distances, feature_indices = knn_cnn_features.run_knn_features(feature_vectors,\
                                                     test_vectors=feature_vectors[:10],k=k, dist=True)
-        print(multi_sec_inference(distances,feature_labels[feature_indices])[:k])
-        return multi_sec_inference(distances,feature_labels[feature_indices])[:k]
-        # return feature_labels[feature_indices]
+        merged_similarities = multi_sec_inference(distances,feature_labels[feature_indices])
+        if verbose:
+            print(merged_similarities[1][:k])
+        if dist:
+            return merged_similarities[0][:k], merged_similarities[1][:k]
+        else:
+            return merged_similarities[1][:k]
     except:
         print("No audio channel found")
 
@@ -117,6 +121,6 @@ feature_vectors, feature_labels = load_sound_data_ucf()
 # import time
 # start = time.time()
 # for i in range(10):
-#     similar_sound_ucf_video('data/UCF101/v_ApplyEyeMakeup_g01_c01.avi')
+#     similar_sound_ucf_video('data/UCF101/v_ApplyEyeMakeup_g01_c01.avi', verbose=True)
 # print((time.time()-start)/10)
-# 3.496312713623047 seconds
+# 1.1657553434371948 seconds
