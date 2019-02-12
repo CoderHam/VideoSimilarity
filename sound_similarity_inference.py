@@ -99,7 +99,7 @@ def multi_sec_inference(distances, feature_indices):
     return [usl.split('/')[-1].split('.')[0] for usl in uniq_sorted_listed]
 
 def similar_sound_ucf_video(vid_path, k=10):
-    feature_vectors, feature_labels = load_sound_data_ucf()
+    # feature_vectors, feature_labels = load_sound_data_ucf()
     try:
         extract_audio_from_video(vid_path)
         audio_embedding = embedding_from_audio('data/audio/'+vid_path.split('/')[-1].split('.')[0]+'.wav')
@@ -112,5 +112,11 @@ def similar_sound_ucf_video(vid_path, k=10):
     except:
         print("No audio channel found")
 
+feature_vectors, feature_labels = load_sound_data_ucf()
 # test
-# similar_sound_ucf_video('data/UCF101/v_ApplyEyeMakeup_g01_c01.avi')
+# import time
+# start = time.time()
+# for i in range(10):
+#     similar_sound_ucf_video('data/UCF101/v_ApplyEyeMakeup_g01_c01.avi')
+# print((time.time()-start)/10)
+# 3.496312713623047 seconds

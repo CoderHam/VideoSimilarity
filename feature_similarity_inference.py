@@ -51,7 +51,7 @@ def multi_sec_inference(distances, feature_indices):
     return [usl.split('/')[-1].split('.')[0] for usl in uniq_sorted_listed]
 
 def similar_feature_ucf_video(vid_path, k=10):
-    feature_vectors, feature_labels = load_feature_data_ucf()
+    # feature_vectors, feature_labels = load_feature_data_ucf()
     vid_feature_vector = extract_features_from_vid(vid_path)
     distances, feature_indices = knn_cnn_features.run_knn_features(\
         feature_vectors, test_vectors=vid_feature_vector,k=k, dist=True)
@@ -59,5 +59,12 @@ def similar_feature_ucf_video(vid_path, k=10):
     print(multi_sec_inference(distances,feature_labels[feature_indices])[:k])
     return multi_sec_inference(distances,feature_labels[feature_indices])[:k]
 
+# load only once
+feature_vectors, feature_labels = load_feature_data_ucf()
 # test
-# similar_feature_ucf_video('data/UCF101/v_ApplyEyeMakeup_g01_c01.avi')
+# import time
+# start = time.time()
+# for i in range(10):
+#     similar_feature_ucf_video('data/UCF101/v_ApplyEyeMakeup_g01_c01.avi')
+# print((time.time()-start)/10)
+# 1.1066886901855468 seconds

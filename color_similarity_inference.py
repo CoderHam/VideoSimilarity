@@ -30,13 +30,19 @@ def get_ordered_unique(listed):
     return ordered_listed
 
 def similar_color_ucf_video(vid_path, k=10):
-    color_vid2imgs, color_labels = load_color_data_ucf()
     vid_feature_vector = extract_vid2img_from_vid(vid_path)
+    # color_vid2imgs, color_labels = load_color_data_ucf()
     vid_feature_vector = vid_feature_vector.flatten()[np.newaxis,].astype('float32')
     distances, feature_indices = knn_cnn_features.run_knn_features(\
         color_vid2imgs, test_vectors=vid_feature_vector,k=k, dist=True)
     print(color_labels[feature_indices][0])
     return color_labels[feature_indices][0]
 
+color_vid2imgs, color_labels = load_color_data_ucf()
 # test
-# similar_color_ucf_video('data/UCF101/v_ApplyEyeMakeup_g01_c01.avi')
+# import time
+# start = time.time()
+# for i in range(10):
+#     similar_color_ucf_video('data/UCF101/v_ApplyEyeMakeup_g01_c01.avi')
+# print((time.time()-start)/10)
+# 2.7975063562393188 seconds
