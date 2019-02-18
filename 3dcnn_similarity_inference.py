@@ -16,12 +16,10 @@ from model import generate_model
 from mean import get_mean
 from classify import classify_video
 
-"""
-python main.py --input input --video_root videos --output output.json
---model resnet-34-kinetics.pth --mode feature --sample_duration 8
-"""
-
 def extract_features():
+    """
+    This function extracts 3D CNN features for all the videos in the dataset.
+    """
     t_start = time.time()
     os.chdir('3d-cnn/')
     os.system('python main.py --input input --video_root videos --output output.json --model resnet-34-kinetics.pth --mode feature --sample_duration 8')
@@ -29,6 +27,9 @@ def extract_features():
     print('Total 3D CNN feature extraction time: {}s'.format(round(t_end - t_start, 2)))
 
 def extract_features_from_vid(video_path, video_filename):
+    """
+    This function extracts 3D CNN features for a single query video.
+    """
     opt = parse_opts()
     opt.input = video_filename
     opt.video_root = video_path
@@ -70,6 +71,10 @@ def extract_features_from_vid(video_path, video_filename):
 
 
 def process_output(output_filename):
+    """
+    This function processes the extracted 3D CNN features for dataset to be used
+    in kNN search algorithm.
+    """
     # load output json file
     with open(output_filename, 'r') as f:
         features = json.load(f)
@@ -87,7 +92,7 @@ def process_output(output_filename):
     feature_vectors = feature_vectors.astype('float32')
     return feature_vectors, ind2video_mapping, video2ind_mapping
 
-
-q_results = extract_features_from_vid('./3d-cnn/videos/', 'v_ApplyEyeMakeup_g04_c02.avi')
-print(len(q_results['clips'][0]['features']))
+# test script
 # extract_features()
+q_results = extract_features_from_vid('./3d-cnn/videos/', 'v_ApplyEyeMakeup_g04_c02.avi')
+print(len(q_results['clips'][0]['features'])) # should be 512
