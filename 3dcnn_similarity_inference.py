@@ -32,7 +32,7 @@ def extract_features_from_vid(video_path, video_filename):
     opt = parse_opts()
     opt.input = video_filename
     opt.video_root = video_path
-    opt.model = 'resnet-34-kinetics.pth'
+    opt.model = './3d-cnn/resnet-34-kinetics.pth'
     opt.mode = 'feature'
     opt.mean = get_mean()
     opt.arch = '{}-{}'.format(opt.model_name, opt.model_depth)
@@ -50,7 +50,7 @@ def extract_features_from_vid(video_path, video_filename):
         print(model)
 
     outputs = []
-    video_path = os.path.join(opt.video_root, input_file)
+    video_path = os.path.join(opt.video_root, video_filename)
     if os.path.exists(video_path):
         subprocess.call('mkdir tmp', shell=True)
         subprocess.call('ffmpeg -i {} tmp/image_%05d.jpg'.format(video_path),
@@ -59,7 +59,7 @@ def extract_features_from_vid(video_path, video_filename):
         outputs.append(result)
         subprocess.call('rm -rf tmp', shell=True)
     else:
-        print('{} does not exist'.format(input_file))
+        print('{} does not exist'.format(video_path))
     return outputs
 
 
@@ -84,5 +84,6 @@ def process_output(output_filename):
 
 q_vector = extract_features_from_vid('data/', 'v_ApplyEyeMakeup_g04_c02.avi')
 print(q_vector)
-print(q_vector.shape)
+print(len(q_vector))
+print(q_vector[0].shape)
 # extract_features()
