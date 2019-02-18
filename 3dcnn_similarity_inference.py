@@ -32,7 +32,7 @@ def extract_features_from_vid(video_path, video_filename):
     opt = parse_opts()
     opt.input = video_filename
     opt.video_root = video_path
-    opt.model = 'resnet-34-kinetics.pth'
+    opt.model = './3d-cnn/resnet-34-kinetics.pth'
     opt.mode = 'feature'
     opt.mean = get_mean()
     opt.arch = '{}-{}'.format(opt.model_name, opt.model_depth)
@@ -50,17 +50,23 @@ def extract_features_from_vid(video_path, video_filename):
         print(model)
 
     outputs = []
-    video_path = os.path.join(opt.video_root, input_file)
+    class_names = []
+    with open('./3d-cnn/class_names_list') as f:
+        for row in f:
+            class_names.append(row[:-1])
+
+    video_path = os.path.join(opt.video_root, video_filename)
+    print(video_path)
     if os.path.exists(video_path):
         subprocess.call('mkdir tmp', shell=True)
         subprocess.call('ffmpeg -i {} tmp/image_%05d.jpg'.format(video_path),
                         shell=True)
-        result = classify_video('tmp', input_file, class_names, model, opt)
+        result = classify_video('tmp', video_filename, class_names, model, opt)
         outputs.append(result)
         subprocess.call('rm -rf tmp', shell=True)
     else:
-        print('{} does not exist'.format(input_file))
-    return outputs
+        print('{} does not exist'.format(video_path))
+    return outputs[0]
 
 
 def process_output(output_filename):
@@ -82,7 +88,6 @@ def process_output(output_filename):
     return feature_vectors, ind2video_mapping, video2ind_mapping
 
 
-q_vector = extract_features_from_vid('data/', 'v_ApplyEyeMakeup_g04_c02.avi')
-print(q_vector)
-print(q_vector.shape)
+q_results = extract_features_from_vid('./3d-cnn/videos/', 'v_ApplyEyeMakeup_g04_c02.avi')
+print(len(q_results['clips'][0]['features']))
 # extract_features()
