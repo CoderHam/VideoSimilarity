@@ -50,17 +50,23 @@ def extract_features_from_vid(video_path, video_filename):
         print(model)
 
     outputs = []
+    class_names = []
+    with open('./3d-cnn/class_names_list') as f:
+        for row in f:
+            class_names.append(row[:-1])
+
     video_path = os.path.join(opt.video_root, video_filename)
+    print(video_path)
     if os.path.exists(video_path):
         subprocess.call('mkdir tmp', shell=True)
         subprocess.call('ffmpeg -i {} tmp/image_%05d.jpg'.format(video_path),
                         shell=True)
-        result = classify_video('tmp', input_file, class_names, model, opt)
+        result = classify_video('tmp', video_filename, class_names, model, opt)
         outputs.append(result)
         subprocess.call('rm -rf tmp', shell=True)
     else:
         print('{} does not exist'.format(video_path))
-    return outputs
+    return outputs[0]
 
 
 def process_output(output_filename):
@@ -82,8 +88,6 @@ def process_output(output_filename):
     return feature_vectors, ind2video_mapping, video2ind_mapping
 
 
-q_vector = extract_features_from_vid('data/', 'v_ApplyEyeMakeup_g04_c02.avi')
-print(q_vector)
-print(len(q_vector))
-print(q_vector[0].shape)
+q_results = extract_features_from_vid('./3d-cnn/videos/', 'v_ApplyEyeMakeup_g04_c02.avi')
+print(len(q_results['clips'][0]['features']))
 # extract_features()
