@@ -103,6 +103,7 @@ venv.bak/
 # mypy
 .mypy_cache/
 
+# data stuff
 data/tmp
 audioset/vggish_model.ckpt
 audioset/vggish_pca_params.npz
