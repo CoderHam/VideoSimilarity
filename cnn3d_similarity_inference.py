@@ -11,6 +11,7 @@ import numpy as np
 import torch
 from torch import nn
 import time
+import h5py
 
 sys.path.insert(0, './3d-cnn')
 from opts import parse_opts
@@ -75,6 +76,17 @@ def extract_features_from_vid(video_path):
         print('{} does not exist'.format(video_path))
     return outputs[0]
 
+def pickle_to_hdf5(pickle_file='./cnn3d_features/ucf101_3dcnn_features'):
+    features = pickle.load(open(pickle_file, 'rb'))
+    feature_vectors = []
+    video_labels = []
+    for video in features:
+        feature_vectors.append(video['clips'][0]['features'])
+        video_labels.append(video['video'])
+    h5f = h5py.File('cnn3d_UCF_features.h5', 'w')
+    h5f['feature_vectors'] = np.array(feature_vectors).astype('float32')
+    h5f['vid_labels'] = np.array(video_labels, dtype='S')
+    h5f.close()
 
 def process_output(output_filename):
     """
@@ -251,7 +263,14 @@ def quick_query_test():
     output_query_results(cnn3d_indices, video_labels, video_labels[0])
     print('\nTest successfully completed!')
 
+def load_cnn3d_feature_data_ucf():
+    h5f = h5py.File('cnn3d_UCF_features.h5', 'r')
+    feature_vectors = np.array(h5f['feature_vectors']).astype('float32')
+    video_labels = np.array([fl.decode() for fl in h5f['vid_labels']])
+    h5f.close()
+    return feature_vectors, video_labels
 
 # test or full build
 # quick_query_test()
 # full_build()
+# load_cnn3d_feature_data_ucf()
