@@ -1,6 +1,7 @@
 import numpy as np
 import faiss
 
+
 ## Using a flat index
 def knn_flat(vector_x, queries_x, d, k, verbose, gpu=True):
     index_flat = faiss.IndexFlatL2(d)  # build a flat (CPU) index
@@ -15,6 +16,7 @@ def knn_flat(vector_x, queries_x, d, k, verbose, gpu=True):
     # we want to see the k nearest neighbors
     D, I = index_flat.search(queries_x, k) # actual search
     return D, I
+
 
 # Using an IVF index
 def knn_ivf(vector_x, queries_x, d, k, verbose, gpu=True):
@@ -35,9 +37,9 @@ def knn_ivf(vector_x, queries_x, d, k, verbose, gpu=True):
     if verbose:
         print("Running with IVF index for", gpu_index_ivf.ntotal,
               "records of with dimensionality", d)
-
     D, I = index_ivf.search(queries_x, k)  # actual search
     return D, I
+
 
 def run(k, flat=True, verbose=False):
     # create fake data

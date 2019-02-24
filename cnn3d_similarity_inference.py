@@ -226,7 +226,9 @@ def quick_query_test():
     """
     Test Script (CPU):
 
-    Tests full data pipeline using sample of UCF 101 dataset.
+    Tests full data pipeline using sample of UCF 101 dataset. It does not
+    perform feature extraction for a single video, instead using one of the
+    extracted features as query video features.
     """
     # data processing
     feature_vectors, video_labels = process_output('./cnn3d_features/ucf101_3dcnn_features_sample.json')
@@ -251,5 +253,5 @@ def quick_query_test():
 
 
 # test or full build
-quick_query_test()
-full_build()
+# quick_query_test()
+# full_build()
