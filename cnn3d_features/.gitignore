@@ -1,0 +1,6 @@
+# ignore feature vectors and video labels file
+ucf101_3dcnn_features_sample.json
+ucf101_3dcnn_features
+features.pickle
+feature_vectors_cnn3d_ucf101
+video_labels_cnn3d_ucf101

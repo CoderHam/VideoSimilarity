@@ -4,6 +4,8 @@ This file performs similarity inference using 3D CNN.
 import os
 import sys
 import json
+import pickle
+import h5py
 import subprocess
 import numpy as np
 import torch
@@ -20,7 +22,11 @@ import knn_cnn_features
 
 def extract_features():
     """
-    This function extracts 3D CNN features for all the videos in the dataset.
+    This function extracts 3D CNN features for all the videos in the dataset
+    using ResNet-34 based model.
+
+    The extraction process takes ~8 hours on AWS GPU instance, and requires
+    around 32GB of memory.
     """
     t_start = time.time()
     os.chdir('3d-cnn/')
@@ -75,34 +81,86 @@ def process_output(output_filename):
     This function processes the extracted 3D CNN features for dataset to be used
     in kNN search algorithm.
     """
-    # load output json file
-    with open(output_filename, 'r') as f:
-        features = json.load(f)
-    # initialize feature vector list and mapping dicts
+    # load extracted features json file
+    try:
+        with open(output_filename, 'r') as f:
+            features = json.load(f)
+    except:
+        file = open(output_filename, 'rb')
+        features = pickle.load(file)
+    # initialize feature vector list and mapping list
     feature_vectors = []
-    ind2video_mapping = {}
-    video2ind_mapping = {}
+    video_labels = []
     # populate the above
     for i, video in enumerate(features):
         feature_vectors.append(video['clips'][0]['features'])
-        ind2video_mapping[i] = video['video']
-        video2ind_mapping[video['video']] = i
+        video_labels.append(video['video'])
     # convert to numpy arrays and float32
     feature_vectors = np.array(feature_vectors)
     feature_vectors = feature_vectors.astype('float32')
-    return feature_vectors, ind2video_mapping, video2ind_mapping
+    return feature_vectors, video_labels
 
 
-def similar_cnn3d_ucf_video(video_path, feature_vectors, k=5, dist=False, verbose=False):
+def save_output(feature_vectors, video_labels, output_filename):
+    """
+    This function saves the processsed feature vectors and video labels into
+    h5py file.
+    """
+    # define paths and filenames
+    output_path = './cnn3d_features/'
+    feature_vectors_filename = 'feature_vectors_' + output_filename
+    video_labels_filename = 'video_labels_' + output_filename
+    # save feature vectors and video labels
+    if not os.path.exists(os.path.join(output_path, feature_vectors_filename)):
+        with h5py.File(os.path.join(output_path, feature_vectors_filename), 'w') as fv:
+            fv.create_dataset("ucf101_cnn3d_feature_vectors",  data=feature_vectors)
+    else:
+        print(feature_vectors_filename + ' already exists!')
+    if not os.path.exists(os.path.join(output_path, video_labels_filename)):
+        video_labels = [label.encode("ascii", "ignore") for label in video_labels]
+        with h5py.File(os.path.join(output_path, video_labels_filename), 'w') as vl:
+            vl.create_dataset("ucf101_cdd3d_video_labels",  data=video_labels)
+    else:
+        print(video_labels_filename + ' already exists!')
+
+
+def load_feature_vectors(feature_vectors_filename, features_path):
+    """
+    This function loads the processed 3D CNN feature vectors for kNN querying.
+    """
+    if os.path.exists(os.path.join(features_path, feature_vectors_filename)):
+        with h5py.File(os.path.join(features_path, feature_vectors_filename), 'r') as fv:
+            print('loading feature vectors...')
+            feature_vectors = fv['ucf101_cnn3d_feature_vectors'][:]
+        return feature_vectors
+    else:
+        print(feature_vectors_filename + ' does not exist!')
+
+
+def load_video_labels(video_labels_filename, features_path):
+    """
+    This function loads the processed video labels.
+    """
+    if os.path.exists(os.path.join(features_path, video_labels_filename)):
+        with h5py.File(os.path.join(features_path, video_labels_filename), 'r') as vl:
+            print('loading video labels...')
+            video_labels = vl['ucf101_cdd3d_video_labels'][:]
+        return video_labels
+    else:
+        print(video_labels_filename + ' does not exist!')
+
+
+def similar_cnn3d_ucf_video(video_path, feature_vectors, k=5, dist=False, verbose=False, gpu=True, query_features=None):
     """
     This function extracts features from the query video and performs kNN similarity search.
     """
     try:
         # query_features = extract_features_from_vid(video_path)
+        assert query_features.shape == (1, 512)
         distances, feature_indices = knn_cnn_features.run_knn_features(feature_vectors, test_vectors=query_features,
-                                                        k=k, dist=True)
+                                                        k=k, dist=True, gpu=gpu)
         if verbose:
-            print(color_labels[feature_indices][0])
+            print(video_labels[feature_indices][0])
         if dist:
             return list(distances[0]), list(feature_indices[0])
         else:
@@ -111,7 +169,7 @@ def similar_cnn3d_ucf_video(video_path, feature_vectors, k=5, dist=False, verbos
         print('No video found!')
 
 
-def output_results(I, ind2video_mapping, query_video_path):
+def output_query_results(knn_indicies, video_labels, query_video_path):
     """
     This function outputs results of a kNN query.
     """
@@ -119,27 +177,79 @@ def output_results(I, ind2video_mapping, query_video_path):
     print('\nQuery Video:\n', query_video_path)
     print('\n')
     print('Top Similar Videos:')
-    for i, ind in enumerate(I):
-        print(i+1, ': ', ind2video_mapping[ind])
+    for i, ind in enumerate(knn_indicies):
+        print(i+1, ': ', video_labels[ind])
 
 
-# test script (GPU)
-# feature_vectors = extract_features()
-# feature_vectors, ind2video_mapping, video2ind_mapping = process_output('output.json')
-# query_video_path = './3d-cnn/videos/v_ApplyEyeMakeup_g04_c02.avi'
-# cnn3d_dist, cnn3d_indices  = similar_3dcnn_ucf_video(query_video_path, feature_vectors, k=5,
-#                         dist=True, verbose=False)
-# output_results(cnn3d_indices, ind2video_mapping, query_video_path)
+def full_build():
+    """
+    This function runs a full data processing build from raw extracted features.
+    """
+    s_time = time.time()
+    print('Starting full 3D CNN feature extraction...')
 
-# test script (CPU)
-# feature_vectors = extract_features()
+    # feature extraction (run this only if full feature extraction needed)
+    # print('Extracting features from UCF101 dataset...')
+    # feature_vectors = extract_features()
 
-with open('output.json', 'r') as f:
-    features = json.load(f)
-query_features = np.array(features[0]['clips'][0]['features'])
-query_features = np.reshape(query_features.astype(np.float32), (1, -1))
-f.close()
-feature_vectors, ind2video_mapping, video2ind_mapping = process_output('output.json')
-query_video_path = 'v_ApplyEyeMakeup_g04_c03.avi'
-cnn3d_dist, cnn3d_indices = similar_cnn3d_ucf_video(query_video_path, feature_vectors, k=3, dist=True, verbose=False)
-output_results(cnn3d_indices, ind2video_mapping, query_video_path)
+    # data processing
+    s_processing = time.time()
+    print('Processing raw extracted features...')
+    feature_vectors, video_labels = process_output('./cnn3d_features/ucf101_3dcnn_features')
+    e_processing = time.time()
+    print('Raw features processing completed in {}s.'.format(round(e_processing - s_processing, 2)))
+
+    # save and load processed features
+    print('Saving processed features...')
+    save_output(feature_vectors, video_labels, 'cnn3d_ucf101')
+    print('Loading processed features...')
+    s_loading = time.time()
+    feature_vectors = load_feature_vectors('feature_vectors_cnn3d_ucf101',
+                                            './cnn3d_features/')
+    video_labels = load_video_labels('video_labels_cnn3d_ucf101',
+                                        './cnn3d_features/')
+    e_loading = time.time()
+    print('Loading processed features completed in {}s.'.format(round(e_loading - s_loading, 2)))
+
+    # test_query
+    query_video = video_labels[0]
+    query_features = feature_vectors[0]
+    query_features = np.reshape(query_features.astype(np.float32), (1, -1))
+    cnn3d_dist, cnn3d_indices = similar_cnn3d_ucf_video(query_video, feature_vectors,
+                                                        k=3, dist=True, verbose=False, gpu=False,
+                                                        query_features=query_features)
+    output_query_results(cnn3d_indices, video_labels, video_labels[0])
+    print('\nFull build successfully completed!')
+
+
+def quick_query_test():
+    """
+    Test Script (CPU):
+
+    Tests full data pipeline using sample of UCF 101 dataset.
+    """
+    # data processing
+    feature_vectors, video_labels = process_output('./cnn3d_features/ucf101_3dcnn_features_sample.json')
+
+    # save and load processed features
+    save_output(feature_vectors, video_labels, 'cnn3d_ucf101')
+    feature_vectors = load_feature_vectors('feature_vectors_cnn3d_ucf101',
+                                            './cnn3d_features/')
+    video_labels = load_video_labels('video_labels_cnn3d_ucf101',
+                                        './cnn3d_features/')
+
+    # test_query
+    # query_video_path = 'v_ApplyEyeMakeup_g04_c03.avi'
+    query_video = video_labels[0]
+    query_features = feature_vectors[0]
+    query_features = np.reshape(query_features.astype(np.float32), (1, -1))
+    cnn3d_dist, cnn3d_indices = similar_cnn3d_ucf_video(query_video, feature_vectors,
+                                                        k=3, dist=True, verbose=False, gpu=False,
+                                                        query_features=query_features)
+    output_query_results(cnn3d_indices, video_labels, video_labels[0])
+    print('\nTest successfully completed!')
+
+
+# test or full build
+quick_query_test()
+full_build()
