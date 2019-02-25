@@ -41,7 +41,7 @@ def knn_ivf(vector_x, queries_x, d, k, verbose, gpu=True):
     return D, I
 
 
-def run(k, flat=True, verbose=False):
+def run(k, flat=False, verbose=False):
     # create fake data
     d = 200                           # dimensionality
     nb = 1000000                      # number of records
@@ -55,11 +55,11 @@ def run(k, flat=True, verbose=False):
     # perform knn search
     if flat:
         D, I = knn_flat(vector_x, queries_x, d, k,
-                        verbose=verbose, gpu=False)
+                        verbose=verbose, gpu=True)
     else:
         D, I = knn_ivf(vector_x, queries_x, d, k,
-                        verbose=verbose, gpu=False)
+                        verbose=verbose, gpu=True)
     # print(I[:5])                   # neighbors of the 5 first queries
     # print(list(zip(D[:5],I[:5])))
 
-run(10)
+# run(10)
