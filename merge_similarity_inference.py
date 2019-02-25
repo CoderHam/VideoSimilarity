@@ -17,7 +17,6 @@ def merge_similarity_ucf_video(vid_path, k=10, verbose=True):
     feature_dist, feature_indices = feature_similarity_inference.similar_feature_ucf_video(vid_path, k=k, dist=True)
     sound_dist, sound_indices = sound_similarity_inference.similar_sound_ucf_video(vid_path, k=k, dist=True)
     cnn3d_dist, cnn3d_indices = cnn3d_similarity_inference.similar_cnn3d_ucf_video(vid_path, k=k, dist=True)
-
     sorted_listed = [x for _,x in sorted(zip(color_dist+feature_dist+sound_dist+cnn3d_dist, color_indices+feature_indices+sound_indices+cnn3d_indices))]
     uniq_sorted_listed, uniq_sorted_dist = get_ordered_unique(sorted_listed, sorted(color_dist+feature_dist+sound_dist+cnn3d_dist))
     if verbose:
