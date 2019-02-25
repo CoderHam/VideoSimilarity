@@ -51,7 +51,7 @@ def extract_features_from_vid(video_path):
     opt.n_classes = 400
 
     model = generate_model(opt)
-    print('loading model {}'.format(opt.model))
+    # print('loading model {}'.format(opt.model))
     model_data = torch.load(opt.model)
     assert opt.arch == model_data['arch']
     model.load_state_dict(model_data['state_dict'])
@@ -67,14 +67,14 @@ def extract_features_from_vid(video_path):
 
     if os.path.exists(opt.input):
         subprocess.call('mkdir tmp', shell=True)
-        subprocess.call('ffmpeg -i {} tmp/image_%05d.jpg'.format(video_path),
-                        shell=True)
-        result = classify_video('tmp', video_filename, class_names, model, opt)
+        subprocess.call('ffmpeg -loglevel panic -i {} tmp/image_%05d.jpg'.format(video_path),shell=True)
+        result = classify_video('tmp', video_path, class_names, model, opt)
         outputs.append(result)
         subprocess.call('rm -rf tmp', shell=True)
     else:
         print('{} does not exist'.format(video_path))
-    return outputs[0]
+
+    return np.array(outputs[0]['clips'][0]['features']).astype('float32')
 
 def pickle_to_hdf5(pickle_file='./cnn3d_features/ucf101_3dcnn_features'):
     features = pickle.load(open(pickle_file, 'rb'))
@@ -159,17 +159,17 @@ def load_video_labels(video_labels_filename, features_path):
             video_labels = vl['ucf101_cdd3d_video_labels'][:]
         return video_labels
     else:
-        print(video_labels_filename + ' does not exist!')
+        print(video_labels_filename+' does not exist!')
 
 
-def similar_cnn3d_ucf_video(video_path, feature_vectors, k=5, dist=False, verbose=False, gpu=True, query_features=None):
+def similar_cnn3d_ucf_video(video_path, k=5, dist=False, verbose=False, gpu=True, query_features=None):
     """
     This function extracts features from the query video and performs kNN similarity search.
     """
     try:
-        # query_features = extract_features_from_vid(video_path)
-        assert query_features.shape == (1, 512)
-        distances, feature_indices = knn_cnn_features.run_knn_features(feature_vectors, test_vectors=query_features,
+        query_features = extract_features_from_vid(video_path)
+        assert query_features.shape == (512,)
+        distances, feature_indices = knn_cnn_features.run_knn_features(feature_vectors, test_vectors=query_features[np.newaxis,:],
                                                         k=k, dist=True, gpu=gpu)
         if verbose:
             print(video_labels[feature_indices][0])
@@ -197,8 +197,8 @@ def full_build():
     """
     This function runs a full data processing build from raw extracted features.
     """
-    s_time = time.time()
-    print('Starting full 3D CNN feature extraction...')
+    # s_time = time.time()
+    # print('Starting full 3D CNN feature extraction...')
 
     # feature extraction (run this only if full feature extraction needed)
     # print('Extracting features from UCF101 dataset...')
@@ -227,8 +227,8 @@ def full_build():
     query_video = video_labels[0]
     query_features = feature_vectors[0]
     query_features = np.reshape(query_features.astype(np.float32), (1, -1))
-    cnn3d_dist, cnn3d_indices = similar_cnn3d_ucf_video(query_video, feature_vectors,
-                                                        k=3, dist=True, verbose=False, gpu=False,
+    cnn3d_dist, cnn3d_indices = similar_cnn3d_ucf_video(query_video,
+                                                        k=3, dist=True, verbose=False, gpu=True,
                                                         query_features=query_features)
     output_query_results(cnn3d_indices, video_labels, video_labels[0])
     print('\nFull build successfully completed!')
@@ -242,23 +242,23 @@ def quick_query_test():
     perform feature extraction for a single video, instead using one of the
     extracted features as query video features.
     """
-    # data processing
-    feature_vectors, video_labels = process_output('./cnn3d_features/ucf101_3dcnn_features_sample.json')
+    if not use_h5:
+        # data processing
+        feature_vectors, video_labels = process_output('./cnn3d_features/ucf101_3dcnn_features_sample.json')
 
-    # save and load processed features
-    save_output(feature_vectors, video_labels, 'cnn3d_ucf101')
-    feature_vectors = load_feature_vectors('feature_vectors_cnn3d_ucf101',
+        # save and load processed features
+        save_output(feature_vectors, video_labels, 'cnn3d_ucf101')
+        feature_vectors = load_feature_vectors('feature_vectors_cnn3d_ucf101',
+                                                './cnn3d_features/')
+        video_labels = load_video_labels('video_labels_cnn3d_ucf101',
                                             './cnn3d_features/')
-    video_labels = load_video_labels('video_labels_cnn3d_ucf101',
-                                        './cnn3d_features/')
-
     # test_query
     # query_video_path = 'v_ApplyEyeMakeup_g04_c03.avi'
     query_video = video_labels[0]
     query_features = feature_vectors[0]
     query_features = np.reshape(query_features.astype(np.float32), (1, -1))
-    cnn3d_dist, cnn3d_indices = similar_cnn3d_ucf_video(query_video, feature_vectors,
-                                                        k=3, dist=True, verbose=False, gpu=False,
+    cnn3d_dist, cnn3d_indices = similar_cnn3d_ucf_video(query_video,
+                                                        k=3, dist=True, verbose=False, gpu=True,
                                                         query_features=query_features)
     output_query_results(cnn3d_indices, video_labels, video_labels[0])
     print('\nTest successfully completed!')
@@ -270,7 +270,17 @@ def load_cnn3d_feature_data_ucf():
     h5f.close()
     return feature_vectors, video_labels
 
+use_h5=True
+if use_h5:
+    feature_vectors, video_labels = load_cnn3d_feature_data_ucf()
+
+# import time
+# start = time.time()
+# for i in range(10):
+#     similar_cnn3d_ucf_video('data/UCF101/v_ApplyEyeMakeup_g01_c01.avi', verbose=False)
+# print((time.time()-start)/10)
+# 2.168000817298889 seconds
+
 # test or full build
 # quick_query_test()
 # full_build()
-# load_cnn3d_feature_data_ucf()
