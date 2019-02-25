@@ -8,7 +8,7 @@ import vggish_inference
 
 def extract_audio_from_video(vid_path):
     vid_name = vid_path.split('/')[-1].split('.')[0]
-    p = subprocess.Popen("ffmpeg -i "+vid_path+" -f wav -vn data/audio/"+vid_name+".wav",
+    p = subprocess.Popen("ffmpeg -loglevel panic -i "+vid_path+" -f wav -vn data/audio/"+vid_name+".wav",
                          stdout=subprocess.PIPE, shell=True)
     (output, err) = p.communicate()
     p_status = p.wait()

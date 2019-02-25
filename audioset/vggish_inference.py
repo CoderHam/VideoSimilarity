@@ -55,7 +55,9 @@ import vggish_input
 import vggish_params
 import vggish_postprocess
 import vggish_slim
-tf.logging.set_verbosity(tf.logging.ERROR)
+# tf.logging.set_verbosity(tf.logging.ERROR)
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 # flags = tf.app.flags
 #
@@ -108,7 +110,7 @@ def main(wav_file=None, checkpoint='audioset/vggish_model.ckpt', pca_params='aud
   with tf.Graph().as_default():
     # config = tf.ConfigProto()
     # restrict tensorflow memory usage
-    config = tf.ConfigProto(gpu_options=tf.GPUOptions(per_process_gpu_memory_fraction=0.5),\
+    config = tf.ConfigProto(gpu_options=tf.GPUOptions(per_process_gpu_memory_fraction=0.4),\
         allow_soft_placement=True)
     config.gpu_options.allow_growth=True
     sess = tf.Session(config=config)
