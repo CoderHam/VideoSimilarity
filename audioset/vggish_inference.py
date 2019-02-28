@@ -103,14 +103,14 @@ def main(wav_file=None, checkpoint='audioset/vggish_model.ckpt', pca_params='aud
   pproc = vggish_postprocess.Postprocessor(pca_params)
 
   # If needed, prepare a record writer to store the postprocessed embeddings.
-  writer = tf.python_io.TFRecordWriter(
-      tfrecord_file) if tfrecord_file else None
+  # writer = tf.python_io.TFRecordWriter(
+  #     tfrecord_file) if tfrecord_file else None
 
   # with tf.Graph().as_default(), tf.Session() as sess:
   with tf.Graph().as_default():
     # config = tf.ConfigProto()
     # restrict tensorflow memory usage
-    config = tf.ConfigProto(gpu_options=tf.GPUOptions(per_process_gpu_memory_fraction=0.4),\
+    config = tf.ConfigProto(gpu_options=tf.GPUOptions(per_process_gpu_memory_fraction=0.2),\
         allow_soft_placement=True)
     config.gpu_options.allow_growth=True
     sess = tf.Session(config=config)
@@ -127,6 +127,7 @@ def main(wav_file=None, checkpoint='audioset/vggish_model.ckpt', pca_params='aud
     [embedding_batch] = sess.run([embedding_tensor],
                                  feed_dict={features_tensor: examples_batch})
     # print(embedding_batch.shape)
+    sess.close()
     postprocessed_batch = pproc.postprocess(embedding_batch)
     # print(postprocessed_batch.shape)
 
@@ -151,11 +152,11 @@ def main(wav_file=None, checkpoint='audioset/vggish_model.ckpt', pca_params='aud
     #     )
     # )
     # print(seq_example)
-    if writer:
-      writer.write(seq_example.SerializeToString())
-    sess.close()
-  if writer:
-    writer.close()
+    # if writer:
+    #   writer.write(seq_example.SerializeToString())
+  # if writer:
+  #   writer.close()
+  tf.reset_default_graph()
   return embedding_batch, postprocessed_batch
 
 # if __name__ == '__main__':

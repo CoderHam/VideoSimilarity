@@ -21,7 +21,7 @@ def merge_similarity_ucf_video(vid_path, k=10, verbose=True):
     uniq_sorted_listed, uniq_sorted_dist = get_ordered_unique(sorted_listed, sorted(color_dist+feature_dist+sound_dist+cnn3d_dist))
     if verbose:
         print(uniq_sorted_listed[:k], uniq_sorted_dist[:k])
-    return uniq_sorted_listed[:k]
+    return list(map(str,uniq_sorted_listed[:k]))
 
 # import time
 # start = time.time()

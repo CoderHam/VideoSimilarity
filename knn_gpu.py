@@ -15,6 +15,7 @@ def knn_flat(vector_x, queries_x, d, k, verbose, gpu=True):
              "records of with dimensionality", d)
     # we want to see the k nearest neighbors
     D, I = index_flat.search(queries_x, k) # actual search
+    del index_flat
     return D, I
 
 
@@ -38,6 +39,7 @@ def knn_ivf(vector_x, queries_x, d, k, verbose, gpu=True):
         print("Running with IVF index for", gpu_index_ivf.ntotal,
               "records of with dimensionality", d)
     D, I = index_ivf.search(queries_x, k)  # actual search
+    del index_ivf
     return D, I
 
 

@@ -56,6 +56,7 @@ def similar_feature_ucf_video(vid_path, k=10, dist=False, verbose=False):
     distances, feature_indices = knn_cnn_features.run_knn_features(\
         feature_vectors, test_vectors=vid_feature_vector,k=k, dist=True)
     # print(len(feature_indices), feature_labels[feature_indices])
+    del vid_feature_vector
     merged_similarities = multi_sec_inference(distances,feature_labels[feature_indices])
     if verbose:
         print(merged_similarities[1][:k])

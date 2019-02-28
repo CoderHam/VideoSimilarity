@@ -35,6 +35,7 @@ def similar_color_ucf_video(vid_path, k=10, dist=False, verbose=False):
     vid_feature_vector = vid_feature_vector.flatten()[np.newaxis,].astype('float32')
     distances, feature_indices = knn_cnn_features.run_knn_features(\
         color_vid2imgs, test_vectors=vid_feature_vector,k=k, dist=True)
+    del vid_feature_vector
     if verbose:
         print(color_labels[feature_indices][0])
     if dist:
