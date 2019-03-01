@@ -74,7 +74,7 @@ As we can see, class-wise accuracy for this method was not that good. With a tes
 
 <center>**Below is the Confusion matrix for KNN on Dominant Color features**
 
-![Confusion matrix for KNN on Dominant Color features](https://github.com/CoderHam/VideoSimilarity/blob/master/plots/confusion_matrix_1.png)</center>
+![Confusion matrix for KNN on Dominant Color features](https://github.com/CoderHam/VideoSimilarity/blob/master/plots/confusion_matrix_2.png)</center>
 
 As we can see there may be some issues with this approach but it is able be capture some color features.
 For example: One of the swimming class had a test accuracy of **82%**.
@@ -131,7 +131,7 @@ As we can see the KNN similarity search scales well with the value of **K**. A s
 
 <center>**Below is the Confusion matrix for KNN on Resnet50 features**</center>
 
-![Confusion matrix for KNN on Resnet50 features](https://github.com/CoderHam/VideoSimilarity/blob/master/plots/confusion_matrix_2.png)</center>
+![Confusion matrix for KNN on Resnet50 features](https://github.com/CoderHam/VideoSimilarity/blob/master/plots/confusion_matrix_1.png)</center>
 
 ## 3. Sound based similarity - [sound_similarity.ipynb](https://github.com/CoderHam/VideoSimilarity/blob/master/sound_similarity.ipynb)
 
