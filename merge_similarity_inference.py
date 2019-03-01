@@ -13,8 +13,8 @@ def get_ordered_unique(listed,dist):
     return ordered_listed, ordered_dist
 
 def merge_similarity_ucf_video(vid_path, k=10, verbose=True):
-    color_dist, color_indices = color_similarity_inference.similar_color_ucf_video(vid_path, k=k, dist=True)
     feature_dist, feature_indices = feature_similarity_inference.similar_feature_ucf_video(vid_path, k=k, dist=True)
+    color_dist, color_indices = color_similarity_inference.similar_color_ucf_video(vid_path, k=k, dist=True)
     sound_dist, sound_indices = sound_similarity_inference.similar_sound_ucf_video(vid_path, k=k, dist=True)
     cnn3d_dist, cnn3d_indices = cnn3d_similarity_inference.similar_cnn3d_ucf_video(vid_path, k=k, dist=True)
     sorted_listed = [x for _,x in sorted(zip(color_dist+feature_dist+sound_dist+cnn3d_dist, color_indices+feature_indices+sound_indices+cnn3d_indices))]
@@ -25,7 +25,7 @@ def merge_similarity_ucf_video(vid_path, k=10, verbose=True):
 
 # import time
 # start = time.time()
-# # # for i in range(10):
-# merge_similarity_ucf_video('data/UCF101/v_ApplyEyeMakeup_g01_c01.avi', verbose=True)
-# print((time.time()-start)/10)
-#  3.8777024269104006 seconds
+# for i in range(5):
+#     merge_similarity_ucf_video('data/UCF101/v_ApplyEyeMakeup_g01_c01.avi', verbose=True)
+# print((time.time()-start)/5)
+#  7.590270018577575 seconds

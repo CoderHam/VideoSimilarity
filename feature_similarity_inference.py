@@ -6,12 +6,15 @@ import extract_features
 import glob
 
 # Using 8 since UCF has a median video length of less than 8 second
-def extract_features_from_vid(vid_path, num_of_frames = 8):
-    p = subprocess.Popen("sh extractNFrames.sh "+vid_path+" "+str(num_of_frames), \
+def extract_features_from_vid(vid_path, num_of_frames=8, new_vid=False):
+    if new_vid:
+        p = subprocess.Popen("sh extractNFrames.sh "+vid_path+" "+str(num_of_frames), \
                          stdout=subprocess.PIPE, shell=True)
-    p_status = p.wait()
-    (output, err) = p.communicate()
-    frame_list = glob.glob('data/tmp/*.jpg')
+        p_status = p.wait()
+        (output, err) = p.communicate()
+        frame_list = glob.glob('data/tmp/*.jpg')
+    else:
+        frame_list = glob.glob('data/tmp/'+vid_path.split('/')[-1].split('.')[0]+'/*.jpg')
     vid_feature_vector = None
     for fr in frame_list:
         feature_vector = extract_features.get_vector_resnet50(fr)
@@ -50,9 +53,9 @@ def multi_sec_inference(distances, feature_indices):
     uniq_sorted_listed, uniq_sorted_dist = get_ordered_unique(sorted_listed, sorted(ordered_distances))
     return uniq_sorted_dist, [usl.split('/')[-1].split('.')[0] for usl in uniq_sorted_listed]
 
-def similar_feature_ucf_video(vid_path, k=10, dist=False, verbose=False):
+def similar_feature_ucf_video(vid_path, k=10, dist=False, verbose=False, new_vid=False):
     # feature_vectors, feature_labels = load_feature_data_ucf()
-    vid_feature_vector = extract_features_from_vid(vid_path)
+    vid_feature_vector = extract_features_from_vid(vid_path, new_vid)
     distances, feature_indices = knn_cnn_features.run_knn_features(\
         feature_vectors, test_vectors=vid_feature_vector,k=k, dist=True)
     # print(len(feature_indices), feature_labels[feature_indices])
