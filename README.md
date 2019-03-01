@@ -1,8 +1,8 @@
 # VideoSimilarity
 
-## Experiments on similarity metrics for videos (and images)
+This project aims to create a prototype video search engine that returns similar videos based on various different methods of measuring similarity.
 
-### 1. Color based similarity - [color_similarity.ipynb](https://github.com/CoderHam/VideoSimilarity/blob/master/color_similarity.ipynb)
+## 1. Color based similarity - [color_similarity.ipynb](https://github.com/CoderHam/VideoSimilarity/blob/master/color_similarity.ipynb)
 
 A Faster - *GPU* based implementation of **k-means clustering** - is used for getting the dominant color.
 
@@ -79,7 +79,7 @@ As we can see, class-wise accuracy for this method was not that good. With a tes
 As we can see there may be some issues with this approach but it is able be capture some color features.
 For example: One of the swimming class had a test accuracy of **82%**.
 
-### 2. Feature based similarity - [feature_similarity.ipynb](https://github.com/CoderHam/VideoSimilarity/blob/master/feature_similarity.ipynb)
+## 2. Feature based similarity - [feature_similarity.ipynb](https://github.com/CoderHam/VideoSimilarity/blob/master/feature_similarity.ipynb)
 
 The [extract_features.py](extract_features.py) script (Pytorch), extracts CNN features/embeddings using a pre-trained Resnet50 model. The feature vector is **2048** dimensional. Since the UCF101 dataset has a median video length of **8** seconds.
 
@@ -133,7 +133,7 @@ As we can see the KNN similarity search scales well with the value of **K**. A s
 
 ![Confusion matrix for KNN on Resnet50 features](https://github.com/CoderHam/VideoSimilarity/blob/master/plots/confusion_matrix_2.png)</center>
 
-### 3. Sound based similarity - [sound_similarity.ipynb](https://github.com/CoderHam/VideoSimilarity/blob/master/sound_similarity.ipynb)
+## 3. Sound based similarity - [sound_similarity.ipynb](https://github.com/CoderHam/VideoSimilarity/blob/master/sound_similarity.ipynb)
 
 The word is based on the `audioset` dataset and `VGGish` model trained by Google (Tensorflow). The pipeline follow subsampling of audio to a standard form followed by creating a `log mel-spectrogram` of size **(96, 64)** for each second. This is then fed into the pre-trained VGGish model that returns a **128** dimensional embedding for each second of audio. It is important to not that all audio clips in this dataset are on **10** seconds each. We use the balanced train split of the audioset data to test the performance which comprises of **21,782** audio clips.
 
@@ -185,6 +185,46 @@ After taking a **70:30** split for train and test data, we get a class-wise accu
 
 ![Confusion matrix for KNN on Audio VGGish features](https://github.com/CoderHam/VideoSimilarity/blob/master/plots/confusion_matrix_3.png)</center>
 
-### Extra - Using Wavelet image hash for similarity search (Not currently using):
+## 4. 3D feature based similarity - [cnn3d_similarity.ipynb](https://github.com/CoderHam/VideoSimilarity/blob/master/cnn3d_similarity.ipynb)
+
+Feature similarity in 3D is similar (pun intended) to 2D feature similarity. However, the layers in CNN model are in 3D, which means the convolution, batching, and max pooling are all done in 3 dimensions. This means that a 3D CNN model can capture spatiotemporal aspects of videos in an end-to-end pipeline.
+
+More information about 3D convolution neural nets is in [this paper from Facebook Research](https://www.cv-foundation.org/openaccess/content_iccv_2015/papers/Tran_Learning_Spatiotemporal_Features_ICCV_2015_paper.pdf) and [another paper with implementation](http://openaccess.thecvf.com/content_cvpr_2018/papers/Hara_Can_Spatiotemporal_3D_CVPR_2018_paper.pdf) from a Japanese research group.
+
+An [implementation](https://github.com/kenshohara/video-classification-3d-cnn-pytorch) of 3D CNN in PyTorch was forked into this repo as submodule `3d-cnn` with some modifications.
+
+Feature extraction was done using a pre-trained model based on ResNet-34 from [this Google Drive](https://drive.google.com/drive/folders/1zvl89AgFAApbH0At-gMuZSeQB_LpNP-M), which also contains other pre-trained models, from the authors of the PyTorch implementation. The pre-trained models are trained using the [Kinetics-400 dataset](https://deepmind.com/research/open-source/open-source-datasets/kinetics/), which has 400 classes instead of the 101 in the UCF-101 dataset.
+
+The length of the 3D CNN feature vector is **512**, same as that of the 2D CNN feature vector for a single frame. The sampling of the videos is done with 8 frames per video.
+
+The total feature extraction process for 13,200 videos in the UCF-101 dataset was done in an AWS GPU instance with at least 32GB of memory, and took approximately 8 hours.
+
+Please refer to the [cnn3d_similarity.ipynb](https://github.com/CoderHam/VideoSimilarity/blob/master/cnn3d_similarity.ipynb) notebook for running the pipeline with extracted features.
+
+**kNN Accuracy**
+
+The class-wise accuracy using kNN with **k=3** of 3D CNN features using the UCF-101 dataset is **89.7%**. When the UCF-101 dataset is split into a test/train set using a 70/30 split similar to the 2D CNN feature based similarity, the accuracy drops to **74.7%**.
+
+While the k=3 accuracy for 3D CNN based features are lower than 2D based similarities, it is important to note that the 3D CNN features are capturing spatiotemporal information of the entire video instead of a single frame, and doing so in a vector of same size. A more complex 3D CNN model (such as DenseNet) will likely give better accuracy results.  
+
+**Confusion Matrix**
+
+<center>**Below is the Confusion matrix for KNN on 3D CNN features**</center>
+
+![Confusion matrix for KNN on 3D CNN features](https://github.com/CoderHam/VideoSimilarity/blob/master/plots/confusion_matrix_cnn3d.png)</center>
+
+Looking at some of the most mischaracterized labels:
+
+| True Label | Predicted Label | % error |
+| --- | --- | --- |
+| FrontCrawl | BreastStroke | 29.3 |
+| Kayaking | Rafting | 22.9 |
+| BandMarching | MilitaryParade | 19.2 |
+| Surfing | Skijet | 18.6 |
+| HammerThrow | ThrowDiscus | 17.6 |
+
+It looks like some of the mislabels are with similar activities, such as BandMarching and MilitaryParade.
+
+## Extra - Using Wavelet image hash for similarity search (Not currently using):
 
 https://fullstackml.com/wavelet-image-hash-in-python-3504fdd282b5 - Uses [imagehash](https://pypi.org/project/ImageHash/), a python library to compute 1 of 4 different hashes and use hashes for comparison
