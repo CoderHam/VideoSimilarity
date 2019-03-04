@@ -1,0 +1,66 @@
+/*
+Font Style
+*/
+body {
+  background-color: gray;
+}
+
+h1 {
+  font-family: verdana;
+  color: white;
+  text-align: center;
+}
+
+h2 {
+  font-family: verdana;
+  color: white;
+  text-align: center;
+  font-size:16px;
+}
+
+p {
+  font-family: verdana;
+  text-align: center;
+  font-size: 14px;
+}
+
+a {
+  font-family: verdana;
+  color: white;
+  text-align: center;
+}
+
+/*
+Containers Styles
+*/
+.query-container {
+  display: flex;
+  height: 500px;
+  align-items: center;
+  background-color: black;
+}
+
+.query-container > div {
+  background-color: #f1f1f1;
+  width: 500px;
+  margin: 50px;
+  text-align: center;
+  line-height: 300px;
+  font-size: 30px;
+}
+
+.results-container {
+  display: flex;
+  height: 500px;
+  align-items: center;
+  background-color: black;
+}
+
+.results-container > div {
+  background-color: #f1f1f1;
+  width: 500px;
+  margin: 50px;
+  text-align: center;
+  line-height: 300px;
+  font-size: 30px;
+}
