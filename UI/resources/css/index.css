@@ -34,33 +34,36 @@ a {
 Containers Styles
 */
 .query-container {
+  justify-content: center;
   display: flex;
-  height: 500px;
+  /* height: 500px; */
   align-items: center;
   background-color: black;
 }
 
 .query-container > div {
-  background-color: #f1f1f1;
-  width: 500px;
-  margin: 50px;
-  text-align: center;
-  line-height: 300px;
-  font-size: 30px;
+  /* background-color: #f1f1f1; */
+  /* width: 500px; */
+  margin: 2%;
+
+  /* text-align: center; */
+  /* line-height: 300px; */
+  /* font-size: 30px; */
 }
 
 .results-container {
+  justify-content: center;
   display: flex;
-  height: 500px;
-  align-items: center;
+  /* height: 500px; */
+  /* align-items: center; */
   background-color: black;
 }
 
 .results-container > div {
-  background-color: #f1f1f1;
-  width: 500px;
-  margin: 50px;
+  /* background-color: #f1f1f1; */
+  /* width: 400px; */
+  margin: 2%;
   text-align: center;
-  line-height: 300px;
-  font-size: 30px;
+  /* line-height: 300px; */
+  /* font-size: 30px; */
 }

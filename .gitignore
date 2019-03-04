@@ -118,3 +118,4 @@ color_UCF_vid2img.h5
 data/vid2img/*.npy
 data/audio/
 ucf101_3dcnn_features
+data/UCF-101/
