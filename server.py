@@ -6,7 +6,7 @@ import json
 @app.route('/api',methods=['POST'])
 def predict():
     data = request.get_json(force=True)
-    prediction = merge_similarity_inference.merge_similarity_ucf_video(data['vid_path'], k=data['k'], verbose=True)
+    prediction = merge_similarity_inference.merge_similarity_ucf_video(data['vid_path'], k=data['k'], verbose=True ,newVid=False)
     # print(jsonify(similar_videos=prediction))
     return jsonify(similar_videos=prediction)
 
