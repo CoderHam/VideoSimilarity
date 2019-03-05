@@ -12,11 +12,11 @@ def get_ordered_unique(listed,dist):
     ordered_dist = [x for i, x in enumerate(dist) if not (listed[i] in seen or seen_add(listed[i]))]
     return ordered_listed, ordered_dist
 
-def merge_similarity_ucf_video(vid_path, k=10, verbose=True):
-    feature_dist, feature_indices = feature_similarity_inference.similar_feature_ucf_video(vid_path, k=k, dist=True)
-    color_dist, color_indices = color_similarity_inference.similar_color_ucf_video(vid_path, k=k, dist=True)
-    sound_dist, sound_indices = sound_similarity_inference.similar_sound_ucf_video(vid_path, k=k, dist=True)
-    cnn3d_dist, cnn3d_indices = cnn3d_similarity_inference.similar_cnn3d_ucf_video(vid_path, k=k, dist=True)
+def merge_similarity_ucf_video(vid_path, k=10, verbose=True, newVid=False):
+    feature_dist, feature_indices = feature_similarity_inference.similar_feature_ucf_video(vid_path, k=k, dist=True, newVid=newVid)
+    color_dist, color_indices = color_similarity_inference.similar_color_ucf_video(vid_path, k=k, dist=True, newVid=newVid)
+    sound_dist, sound_indices = sound_similarity_inference.similar_sound_ucf_video(vid_path, k=k, dist=True, newVid=newVid)
+    cnn3d_dist, cnn3d_indices = cnn3d_similarity_inference.similar_cnn3d_ucf_video(vid_path, k=k, dist=True, newVid=newVid)
     sorted_listed = [x for _,x in sorted(zip(color_dist+feature_dist+sound_dist+cnn3d_dist, color_indices+feature_indices+sound_indices+cnn3d_indices))]
     uniq_sorted_listed, uniq_sorted_dist = get_ordered_unique(sorted_listed, sorted(color_dist+feature_dist+sound_dist+cnn3d_dist))
     if verbose:
@@ -26,6 +26,6 @@ def merge_similarity_ucf_video(vid_path, k=10, verbose=True):
 # import time
 # start = time.time()
 # for i in range(5):
-#     merge_similarity_ucf_video('data/UCF101/v_ApplyEyeMakeup_g01_c01.avi', verbose=True)
+#     merge_similarity_ucf_video('data/UCF101/v_ApplyEyeMakeup_g01_c01.webm', verbose=True, newVid=True)
 # print((time.time()-start)/5)
-#  7.590270018577575 seconds
+#  8-12 seconds (1.2 s if not new video)

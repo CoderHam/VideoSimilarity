@@ -162,19 +162,26 @@ def load_video_labels(video_labels_filename, features_path):
         print(video_labels_filename+' does not exist!')
 
 
-def similar_cnn3d_ucf_video(video_path, k=5, dist=False, verbose=False, gpu=True, query_features=None):
+def similar_cnn3d_ucf_video(video_path, k=10, dist=False, verbose=False, gpu=True, query_features=None, newVid=False):
     """
     This function extracts features from the query video and performs kNN similarity search.
     """
     try:
-        query_features = extract_features_from_vid(video_path)
-        assert query_features.shape == (512,)
-        distances, feature_indices = knn_cnn_features.run_knn_features(feature_vectors, test_vectors=query_features[np.newaxis,:],
-                                                        k=k, dist=True, gpu=gpu)
+        if newVid:
+            if query_features is not np.ndarray:
+                query_features = extract_features_from_vid(video_path)
+            assert query_features.shape == (512,)
+            distances, feature_indices = knn_cnn_features.run_knn_features(feature_vectors,
+                test_vectors=query_features[np.newaxis,:], k=k, dist=True, flat=True, gpu=gpu)
+        else:
+            query_features = feature_vectors[np.where(video_labels == np.str_(video_path.split('/')[-1].split(".")[-2]+".avi"))[0]]
+            distances, feature_indices = knn_cnn_features.run_knn_features(feature_vectors,
+                test_vectors=query_features, k=k, dist=True, gpu=gpu)
+        del query_features
         if verbose:
             print(video_labels[feature_indices][0])
         if dist:
-            return list(distances[0]), list(feature_indices[0])
+            return list(distances[0]), list(map(str,video_labels[feature_indices[0]]))
         else:
             return list(feature_indices[0])
     except:
@@ -228,8 +235,7 @@ def full_build():
     query_features = feature_vectors[0]
     query_features = np.reshape(query_features.astype(np.float32), (1, -1))
     cnn3d_dist, cnn3d_indices = similar_cnn3d_ucf_video(query_video,
-                                                        k=3, dist=True, verbose=False, gpu=True,
-                                                        query_features=query_features)
+            k=3, dist=True, verbose=False, gpu=True, query_features=query_features)
     output_query_results(cnn3d_indices, video_labels, video_labels[0])
     print('\nFull build successfully completed!')
 
@@ -258,8 +264,7 @@ def quick_query_test():
     query_features = feature_vectors[0]
     query_features = np.reshape(query_features.astype(np.float32), (1, -1))
     cnn3d_dist, cnn3d_indices = similar_cnn3d_ucf_video(query_video,
-                                                        k=3, dist=True, verbose=False, gpu=True,
-                                                        query_features=query_features)
+        k=3, dist=True, verbose=False, gpu=True, flat=True, query_features=query_features)
     output_query_results(cnn3d_indices, video_labels, video_labels[0])
     print('\nTest successfully completed!')
 
@@ -276,10 +281,10 @@ if use_h5:
 
 # import time
 # start = time.time()
-# for i in range(10):
-#     similar_cnn3d_ucf_video('data/UCF101/v_ApplyEyeMakeup_g01_c01.avi', verbose=False)
-# print((time.time()-start)/10)
-# 2.168000817298889 seconds
+# for i in range(5):
+#     similar_cnn3d_ucf_video('data/UCF101/v_ApplyEyeMakeup_g01_c01.webm', verbose=True, newVid=True)
+# print((time.time()-start)/5)
+# 2.168000817298889 seconds (1 s if not new video)
 
 # test or full build
 # quick_query_test()
