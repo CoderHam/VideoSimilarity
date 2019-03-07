@@ -125,6 +125,6 @@ feature_vectors, feature_labels = load_sound_data_ucf()
 # import time
 # start = time.time()
 # for i in range(5):
-#     similar_sound_ucf_video('data/UCF101/v_ApplyEyeMakeup_g01_c01.webm', verbose=True, newVid=True)
+#     similar_sound_ucf_video('data/UCF101/v_ApplyEyeMakeup_g01_c01.mp4', verbose=True, newVid=True)
 # print((time.time()-start)/5)
 # 2.0657553434371948 seconds (0.5 s if not new video)
