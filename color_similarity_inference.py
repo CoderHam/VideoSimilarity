@@ -41,7 +41,7 @@ def similar_color_ucf_video(vid_path, k=10, dist=False, verbose=False, newVid=Fa
     if verbose:
         print(color_labels[feature_indices][0])
     if dist:
-        return list(distances[0]), list(map(str,color_labels[feature_indices][0]))
+        return list(distances[0]), list(map(str, color_labels[feature_indices][0]))
     else:
         return list(color_labels[feature_indices][0])
 
@@ -50,6 +50,6 @@ color_vid2imgs, color_labels = load_color_data_ucf()
 # import time
 # start = time.time()
 # for i in range(5):
-#     similar_color_ucf_video('data/UCF101/v_ApplyEyeMakeup_g01_c01.webm', verbose=True, newVid=True)
+#     similar_color_ucf_video('data/UCF101/v_ApplyEyeMakeup_g01_c01.mp4', verbose=True, newVid=True)
 # print((time.time()-start)/5)
 # 2.293074941635132 seconds (0.9 seconds if not new video)

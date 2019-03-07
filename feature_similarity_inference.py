@@ -64,7 +64,7 @@ def similar_feature_ucf_video(vid_path, k=10, dist=False, verbose=False, newVid=
     if verbose:
         print(merged_similarities[1][:k])
     if dist:
-        return merged_similarities[0][:k], merged_similarities[1][:k]
+        return merged_similarities[0][:k], list(map(str,merged_similarities[1][:k]))
     else:
         return merged_similarities[1][:k]
 
@@ -74,6 +74,6 @@ feature_vectors, feature_labels = load_feature_data_ucf()
 # import time
 # start = time.time()
 # for i in range(5):
-#     similar_feature_ucf_video('data/UCF101/v_ApplyEyeMakeup_g01_c01.webm',verbose=True, newVid=False)
+#     similar_feature_ucf_video('data/UCF101/v_ApplyEyeMakeup_g01_c01.mp4',verbose=False, newVid=False)
 # print((time.time()-start)/5)
 # 0.7 seconds (0.3 s if no not video)

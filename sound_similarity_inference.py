@@ -109,12 +109,14 @@ def similar_sound_ucf_video(vid_path, k=10, dist=False, verbose=False, newVid=Fa
         audio_embedding = feature_vectors[np.where(feature_labels=="data/audio/"+vid_path.split('/')[-1].split(".")[-2]+".npy")]
     distances, feature_indices = knn_cnn_features.run_knn_features(feature_vectors,\
             test_vectors=feature_vectors[:10],k=k, dist=True, flat=True)
+    # adjust for silence
+    distances = [d+1000 for d in distances]
     del audio_embedding
     merged_similarities = multi_sec_inference(distances,feature_labels[feature_indices])
     if verbose:
         print(merged_similarities[1][:k])
     if dist:
-        return merged_similarities[0][:k], merged_similarities[1][:k]
+        return merged_similarities[0][:k], list(map(str,merged_similarities[1][:k]))
     else:
         return merged_similarities[1][:k]
 

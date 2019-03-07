@@ -181,7 +181,7 @@ def similar_cnn3d_ucf_video(video_path, k=10, dist=False, verbose=False, gpu=Tru
         if verbose:
             print(video_labels[feature_indices][0])
         if dist:
-            return list(distances[0]), list(map(str,video_labels[feature_indices[0]]))
+            return list(distances[0]), list(map(lambda x: str(x).split('/')[-1].split(".")[-2],video_labels[feature_indices[0]]))
         else:
             return list(feature_indices[0])
     except:
@@ -282,7 +282,7 @@ if use_h5:
 # import time
 # start = time.time()
 # for i in range(5):
-#     similar_cnn3d_ucf_video('data/UCF101/v_ApplyEyeMakeup_g01_c01.webm', verbose=True, newVid=True)
+#     similar_cnn3d_ucf_video('data/UCF101/v_ApplyEyeMakeup_g01_c01.mp4', verbose=True, newVid=False)
 # print((time.time()-start)/5)
 # 2.168000817298889 seconds (1 s if not new video)
 
