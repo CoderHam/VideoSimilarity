@@ -34,36 +34,26 @@ a {
 Containers Styles
 */
 .query-container {
-  justify-content: center;
-  display: flex;
-  /* height: 500px; */
+  text-align:center;
+  display:block;
   align-items: center;
   background-color: black;
 }
 
 .query-container > div {
-  /* background-color: #f1f1f1; */
-  /* width: 500px; */
   margin: 2%;
-
-  /* text-align: center; */
-  /* line-height: 300px; */
-  /* font-size: 30px; */
+  text-align:center;
 }
 
 .results-container {
-  justify-content: center;
   display: flex;
-  /* height: 500px; */
-  /* align-items: center; */
+  align-items: center;
+  flex-flow: row wrap;
   background-color: black;
+  justify-content: center;
 }
 
 .results-container > div {
-  /* background-color: #f1f1f1; */
-  /* width: 400px; */
+  text-align:center;
   margin: 2%;
-  text-align: center;
-  /* line-height: 300px; */
-  /* font-size: 30px; */
 }

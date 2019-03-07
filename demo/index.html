@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Video Similarity Search Engine</title>
+<link href="demo/css/index.css" type="text/css" rel="stylesheet">
+</head>
+
+<body>
+
+<h1>Video Similarity Search Engine</h1>
+
+<h2>Query Video</h2>
+<div class="query-container">
+  <!-- Query Video -->
+  <div>
+    {% if vid_input %}
+      <video src="data/UCF101/{{vid_input}}" type='video/mp4' controls loop></video>
+    {% else %}
+      <video src="data/UCF101/v_ApplyEyeMakeup_g01_c01.mp4" type='video/mp4' controls loop></video>
+    {% endif %}
+    </div>
+  <form action="http://localhost:5000/uploader" method = "POST" enctype = "multipart/form-data">
+     <input type="file" name="file" />
+     <input type="number" name="k" min="3" max="100" value='5'>
+     <input type = "submit" ="Search"/>
+</div>
+
+<h2>Search Results</h2>
+<div class="results-container">
+  {% if similar_vids %}
+    {% for sim_vid in similar_vids %}
+    <div>
+      <video src="data/UCF101/{{sim_vid}}.mp4" type='video/mp4' controls loop></video>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div>
+      <video src="data/UCF101/v_ApplyEyeMakeup_g01_c01.mp4" type='video/mp4' controls loop></video>
+    </div>
+    <div>
+      <video src="data/UCF101/v_ApplyEyeMakeup_g01_c02.mp4" type='video/mp4' controls loop></video>
+    </div>
+    <div>
+      <video src="data/UCF101/v_ApplyEyeMakeup_g01_c03.mp4" type='video/mp4' controls loop></video>
+    </div>
+    <div>
+      <video src="data/UCF101/v_ApplyEyeMakeup_g01_c04.mp4" type='video/mp4' controls loop></video>
+    </div>
+  {% endif %}
+</div>
+
+<p>University of Washington MS Data Science Spring 2019 Capstone Project</p>
+
+<p><a href="https://github.com/CoderHam/VideoSimilarity">GitHub Repo</a></p>
+<p>Hemant Jain</p>
+<p>Nimisha Sharath</p>
+<p>Ryan Bae</p>
+</body>
+</html>
